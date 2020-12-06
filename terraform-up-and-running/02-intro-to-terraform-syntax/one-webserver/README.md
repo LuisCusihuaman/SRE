@@ -2,7 +2,8 @@
 
 This folder contains an example [Terraform](https://www.terraform.io/) configuration that deploys a single web server (using 
 [EC2](https://aws.amazon.com/ec2/)) in an [Amazon Web Services (AWS) account](http://aws.amazon.com/). The web server
-listens on port 8080 and returns the text "Hello, World" for the `/` URL.
+listens on port 8080 (which is defined as a variable in this example) and returns the text "Hello, World" for the `/` 
+URL.
 
 For more info, please see Chapter 2, "Getting started with Terraform", of 
 *[Terraform: Up and Running](http://www.terraformupandrunning.com)*.
