@@ -1,12 +1,3 @@
-locals {
-  http_port = 80
-  any_port = 0
-  any_protocol = "-1"
-  tcp_protocol = "tcp"
-  all_ips = [
-    "0.0.0.0/0"]
-}
-
 resource "aws_launch_configuration" "example" {
   image_id = "ami-0885b1f6bd170450c"
   instance_type = var.instance_type
@@ -32,7 +23,6 @@ data "template_file" "user_data" {
 resource "aws_autoscaling_group" "example" {
   launch_configuration = aws_launch_configuration.example.name
   vpc_zone_identifier = data.aws_subnet_ids.default.ids
-
   target_group_arns = [
     aws_lb_target_group.asg.arn]
   health_check_type = "ELB"
@@ -48,19 +38,21 @@ resource "aws_autoscaling_group" "example" {
 }
 
 resource "aws_security_group" "instance" {
-  name = var.instance_security_group_name
+  name = "${var.cluster_name}-instance"
+}
 
-  ingress {
-    from_port = var.server_port
-    to_port = var.server_port
-    protocol = "tcp"
-    cidr_blocks = [
-      "0.0.0.0/0"]
-  }
+resource "aws_security_group_rule" "allow_server_http_inbound" {
+  type = "ingress"
+  security_group_id = aws_security_group.instance.id
+
+  from_port = var.server_port
+  to_port = var.server_port
+  protocol = local.tcp_protocol
+  cidr_blocks = local.all_ips
 }
 
 resource "aws_lb" "example" {
-  name = var.alb_name
+  name = var.cluster_name
   load_balancer_type = "application"
   subnets = data.aws_subnet_ids.default.ids
   security_groups = [
@@ -85,7 +77,7 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_lb_target_group" "asg" {
-  name = var.alb_name
+  name = var.cluster_name
   port = var.server_port
   protocol = "HTTP"
   vpc_id = data.aws_vpc.default.id
@@ -152,6 +144,15 @@ data "terraform_remote_state" "db" {
   }
 }
 
+locals {
+  http_port = 80
+  any_port = 0
+  any_protocol = "-1"
+  tcp_protocol = "tcp"
+  all_ips = [
+    "0.0.0.0/0"]
+}
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -159,3 +160,4 @@ data "aws_vpc" "default" {
 data "aws_subnet_ids" "default" {
   vpc_id = data.aws_vpc.default.id
 }
+
