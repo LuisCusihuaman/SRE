@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	httpHelper "github.com/gruntwork-io/terratest/modules/http-helper"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"strings"
 	"testing"
@@ -10,15 +11,16 @@ import (
 )
 
 func TestHelloWorldAppExample(t *testing.T) {
+	t.Parallel()
+
 	opts := &terraform.Options{
-		// You should update this relative path to point at your
-		// hello-world-app example directory!
 		TerraformDir: "../examples/hello-world-app/standalone",
 		Vars: map[string]interface{}{
 			"mysql_config": map[string]interface{}{
 				"address": "mock-value-for-test",
 				"port":    3306,
 			},
+			"environment": fmt.Sprintf("test-%s", random.UniqueId()),
 		},
 	}
 

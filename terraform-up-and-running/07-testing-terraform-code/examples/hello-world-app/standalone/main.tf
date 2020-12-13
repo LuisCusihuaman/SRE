@@ -6,7 +6,7 @@ module "hello_world_app" {
   source = "../../../modules/services/hello-world-app"
 
   server_text = "Hello, World"
-  environment = "example"
+  environment = var.environment
 
   db_remote_state_bucket = "terraform-up-and-running-state-cusihuaman"
   db_remote_state_key = "example/terraform.tfstate"

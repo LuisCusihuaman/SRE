@@ -3,13 +3,19 @@ package test
 import (
 	"fmt"
 	httpHelper "github.com/gruntwork-io/terratest/modules/http-helper"
+	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"testing"
 	"time"
 )
 
 func TestAlbExample(t *testing.T) {
-	opts := &terraform.Options{TerraformDir: "../examples/alb"}
+	t.Parallel()
+
+	opts := &terraform.Options{TerraformDir: "../examples/alb",
+		Vars: map[string]interface{}{
+			"alb_name": fmt.Sprintf("test-%s", random.UniqueId()),
+		}}
 
 	// Clean up everything at the end of the test
 	defer terraform.Destroy(t, opts)
