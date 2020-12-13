@@ -3,27 +3,8 @@
 # You must provide a value for each of these parameters.
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "cluster_name" {
-  description = "The name to use for all the cluster resources"
-  type = string
-}
 variable "environment" {
   description = "The name of the environment we're deploying to"
-  type        = string
-}
-
-variable "db_remote_state_bucket" {
-  description = "The name of the S3 bucket for the database's remote state"
-  type = string
-}
-
-variable "db_remote_state_key" {
-  description = "The path for the database's remote state in S3"
-  type = string
-}
-
-variable "instance_type" {
-  description = "The type of EC2 Instances to run (e.g. t2.micro)"
   type = string
 }
 
@@ -37,20 +18,38 @@ variable "max_size" {
   type = number
 }
 
+variable "enable_autoscaling" {
+  description = "If set to true, enable auto scaling"
+  type = bool
+}
+
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These parameters have reasonable defaults.
 # ---------------------------------------------------------------------------------------------------------------------
 
+variable "ami" {
+  description = "The AMI to run in the cluster"
+  type = string
+  default = "ami-0c55b159cbfafe1f0"
+}
+
+variable "instance_type" {
+  description = "The type of EC2 Instances to run (e.g. t2.micro)"
+  type = string
+  default = "t2.micro"
+}
+
+variable "server_text" {
+  description = "The text the web server should return"
+  default = "Hello, World"
+  type = string
+}
+
 variable "server_port" {
   description = "The port the server will use for HTTP requests"
   type = number
   default = 8080
-}
-
-variable "enable_autoscaling" {
-  description = "If set to true, enable auto scaling"
-  type = bool
 }
 
 variable "custom_tags" {
@@ -59,13 +58,35 @@ variable "custom_tags" {
   default = {}
 }
 
-variable "ami" {
-  description = "The AMI to run in the cluster"
-  default = "ami-0885b1f6bd170450c"
+variable "db_remote_state_bucket" {
+  description = "The name of the S3 bucket for the DB's Terraform state"
   type = string
+  default = null
 }
-variable "server_text" {
-  description = "The text the webserver should return"
-  default = "Hello, world"
+
+variable "db_remote_state_key" {
+  description = "The path in the S3 bucket for the DB's Terraform state"
   type = string
+  default = null
+}
+
+variable "vpc_id" {
+  description = "The ID of the VPC to deploy into"
+  type = string
+  default = null
+}
+
+variable "subnets_ids" {
+  description = "The IDs of the subnets to deploy into"
+  type = list(string)
+  default = null
+}
+
+variable "mysql_config" {
+  description = "The config for the MySQL DB"
+  type = object({
+    address = string
+    port = number
+  })
+  default = null
 }

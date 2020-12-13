@@ -87,7 +87,7 @@ resource "aws_cloudwatch_metric_alarm" "high_cpu_utilization" {
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.example.name
   }
-  comparison_operator = "GreaterThanThreshould"
+  comparison_operator = "GreaterThanThreshold"
   evaluation_periods = 1
   period = 300
   statistic = "Average"
