@@ -1,3 +1,11 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
+terraform {
+  # Partial configuration. The rest will be filled in by Terragrunt.
+  backend "s3" {}
+}
 
 resource "aws_db_instance" "example" {
   identifier_prefix   = "terraform-up-and-running"
