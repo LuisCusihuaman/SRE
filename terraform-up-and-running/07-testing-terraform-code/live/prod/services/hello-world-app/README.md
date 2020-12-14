@@ -6,7 +6,7 @@ World" application across a cluster of web servers (using [EC2](https://aws.amaz
 This module also adds a listener rule to a load balancer (using [ELB](https://aws.amazon.com/elasticloadbalancing/)) 
 to respond with "Hello, World" to the `/` URL. 
 
-For more info, please see Chapter 7, "How to test Terraform code", of 
+For more info, please see Chapter 6, "Production-grade Terraform code", of 
 *[Terraform: Up and Running](http://www.terraformupandrunning.com)*.
 
 ## Pre-requisites

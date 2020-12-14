@@ -1,6 +1,7 @@
 provider "aws" {
   region = "us-east-1"
 }
+
 module "alb" {
   source = "../../modules/networking/alb"
   alb_name = var.alb_name
