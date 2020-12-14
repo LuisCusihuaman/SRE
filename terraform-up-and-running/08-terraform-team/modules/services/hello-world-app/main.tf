@@ -1,9 +1,8 @@
 provider "aws" {
   region = "us-east-1"
 }
-0
+
 terraform {
-  # Partial configuration. The rest will be filled in by Terragrunt.
   backend "s3" {}
 }
 
