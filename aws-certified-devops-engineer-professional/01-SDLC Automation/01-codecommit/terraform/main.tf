@@ -27,3 +27,12 @@ resource "aws_codestarnotifications_notification_rule" "git_codestart_notificati
     address = aws_sns_topic.git_notification.arn
   }
 }
+
+resource "aws_codecommit_trigger" "git_trigger" {
+  repository_name = aws_codecommit_repository.git_repository.repository_name
+  trigger {
+    destination_arn = aws_sns_topic.git_notification.arn
+    events = ["createReference"]
+    name = "MyFirstDemoTrigger"
+  }
+}
