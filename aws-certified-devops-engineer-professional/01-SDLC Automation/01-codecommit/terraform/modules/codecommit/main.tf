@@ -42,7 +42,7 @@ resource "aws_codecommit_trigger" "git_trigger" {
 
 // Lambda integration
 module "lambda" {
-  source = "./modules/lambda"
+  source = "../lambda"
 }
 resource "aws_codecommit_trigger" "git_lambda_trigger" {
   repository_name = aws_codecommit_repository.git_repository.repository_name
@@ -51,4 +51,9 @@ resource "aws_codecommit_trigger" "git_lambda_trigger" {
     events = ["all"]
     name = "MyLambdaTrigger"
   }
+}
+module "codebuild" {
+  source = "../codebuild"
+  codecommit_repo_url = aws_codecommit_repository.git_repository.clone_url_http
+  codecommit_repo_name = aws_codecommit_repository.git_repository.repository_name
 }

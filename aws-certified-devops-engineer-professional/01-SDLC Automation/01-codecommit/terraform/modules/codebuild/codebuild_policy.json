@@ -1,0 +1,39 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:logs:us-east-1:${account_id}:log-group:/aws/codebuild/${codebuild_name}",
+        "arn:aws:logs:us-east-1:${account_id}:log-group:/aws/codebuild/${codebuild_name}:*"
+      ],
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Resource": [
+        "arn:aws:codecommit:us-east-1:${account_id}:${codecommit_name}"
+      ],
+      "Action": [
+        "codecommit:GitPull"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:CreateReportGroup",
+        "codebuild:CreateReport",
+        "codebuild:UpdateReport",
+        "codebuild:BatchPutTestCases",
+        "codebuild:BatchPutCodeCoverages"
+      ],
+      "Resource": [
+        "arn:aws:codebuild:us-east-1:${account_id}:report-group/${codebuild_name}-*"
+      ]
+    }
+  ]
+}
