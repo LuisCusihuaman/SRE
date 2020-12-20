@@ -14,3 +14,6 @@ module "codebuild" {
 module "lambda" {
   source = "../lambda"
 }
+module "codedeploy" {
+  source = "../codedeploy"
+}
