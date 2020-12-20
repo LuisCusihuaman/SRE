@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # ---------------------------------------------------------------------------------------------------------------------
 # Create trusted IAM Role for CodeBuild project to execute by assuming role
 # Provider Docs: https://www.terraform.io/docs/providers/aws/r/iam_role.html
@@ -58,7 +54,7 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
-# Create and attach IAM Role policy for CodeBuild to write to and create CloudWatch log streams
+# Create and attach IAM Role inline-policy for CodeBuild to write to and create CloudWatch log streams
 # Attached a first role created for lambda
 # Provider Docs: https://www.terraform.io/docs/providers/aws/r/iam_policy.html
 # Data Docs: https://www.terraform.io/docs/providers/aws/d/iam_policy_document.html

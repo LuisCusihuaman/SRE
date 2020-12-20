@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_codecommit_repository" "git_repository" {
   repository_name = "my-webpage"
   description = "This is my webpage repostory for cicd-demo"
@@ -40,20 +36,17 @@ resource "aws_codecommit_trigger" "git_trigger" {
   }
 }
 
-// Lambda integration
-module "lambda" {
-  source = "../lambda"
-}
 resource "aws_codecommit_trigger" "git_lambda_trigger" {
+  count = var.lambda_function_arn == "" ? 0:1
   repository_name = aws_codecommit_repository.git_repository.repository_name
   trigger {
-    destination_arn = module.lambda.git_lambda_function.arn
+    destination_arn = var.lambda_function_arn
     events = ["all"]
     name = "MyLambdaTrigger"
   }
 }
-module "codebuild" {
-  source = "../codebuild"
-  codecommit_repo_url = aws_codecommit_repository.git_repository.clone_url_http
-  codecommit_repo_name = aws_codecommit_repository.git_repository.repository_name
-}
+//module "codebuild" {
+//  source = "../codebuild"
+//  codecommit_repo_url = aws_codecommit_repository.git_repository.clone_url_http
+//  codecommit_repo_name = aws_codecommit_repository.git_repository.repository_name
+//}

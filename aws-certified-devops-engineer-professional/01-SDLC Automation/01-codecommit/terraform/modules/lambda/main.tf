@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 variable "lambda_name" {
   type = string
   default = "lambda-codecommit"
