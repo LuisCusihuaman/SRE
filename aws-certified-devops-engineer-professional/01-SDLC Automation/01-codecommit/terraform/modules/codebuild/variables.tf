@@ -12,3 +12,7 @@ variable "codebuild_name" {
   type = string
   default = "MyWebAppCodeBuildMaster"
 }
+variable "pipeline_bucket_arn" {
+  description = "Bucket arn where artifacts are saved after build"
+  type = string
+}

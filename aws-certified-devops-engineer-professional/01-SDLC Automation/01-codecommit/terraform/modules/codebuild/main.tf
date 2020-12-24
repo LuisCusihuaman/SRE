@@ -39,7 +39,9 @@ resource "aws_codebuild_project" "git_project" {
     type = "LINUX_CONTAINER"
   }
   artifacts {
-    type = "NO_ARTIFACTS"
+    type = "S3"
+    location = var.pipeline_bucket_arn
+    packaging = "ZIP"
   }
 }
 # ---------------------------------------------------------------------------------------------------------------------
@@ -69,6 +71,7 @@ resource "aws_iam_role_policy" "policy" {
     account_id = data.aws_caller_identity.current.account_id
     codebuild_name = var.codebuild_name
     codecommit_name = var.codecommit_repo_name
+    codepipeline_bucket_arn = var.pipeline_bucket_arn
   })
 }
 

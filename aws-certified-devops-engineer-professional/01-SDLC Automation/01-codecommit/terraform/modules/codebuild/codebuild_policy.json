@@ -34,6 +34,20 @@
       "Resource": [
         "arn:aws:codebuild:us-east-1:${account_id}:report-group/${codebuild_name}-*"
       ]
+    },
+    {
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:GetBucketAcl",
+        "s3:GetBucketLocation"
+      ],
+      "Effect": "Allow",
+      "Resource": [
+        "${codepipeline_bucket_arn}",
+        "${codepipeline_bucket_arn}/*"
+      ]
     }
   ]
 }
