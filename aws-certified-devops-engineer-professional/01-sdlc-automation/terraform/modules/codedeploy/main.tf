@@ -123,8 +123,7 @@ resource "aws_iam_instance_profile" "ec2_profile" {
 }
 resource "aws_instance" "web_server" {
   count = var.tier == "dev" ? 1:3
-  // amazon linux 2  | us-east-1
-  ami = "ami-04d29b6f966df1537"
+  ami = "ami-04d29b6f966df1537" // amazon linux 1  | us-east-1
   instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.instance.id]
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
@@ -159,7 +158,7 @@ resource "aws_s3_bucket" "bucket_deploy_revisions" {
 # ---------------------------------------------------------------------------------------------------------------------
 resource "null_resource" "deploy_revision_app" {
   provisioner "local-exec" {
-    command = "aws deploy push --application-name ${aws_codedeploy_app.git_deploy_app.name} --source ${path.module}/cicd-demo --s3-location s3://${aws_s3_bucket.bucket_deploy_revisions.id}/codedeploy-demo/app.zip --ignore-hidden-files --region us-east-1"
+    command = "aws deploy push --application-name ${aws_codedeploy_app.git_deploy_app.name} --source ${path.module}/../codecommit/cicd-demo-repo --s3-location s3://${aws_s3_bucket.bucket_deploy_revisions.id}/codedeploy-demo/app.zip --ignore-hidden-files --region us-east-1"
   }
   depends_on = [aws_instance.web_server, aws_s3_bucket.bucket_deploy_revisions]
 }

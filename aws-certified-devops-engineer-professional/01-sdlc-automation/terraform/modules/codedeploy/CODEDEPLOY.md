@@ -13,10 +13,10 @@ sudo service codedeploy-agent status
 # create a bucket and enable versioning
 ```
 aws s3 mb s3://aws-devops-course-stephane --region eu-west-1 --profile aws-devops
-aws s3api put-bucket-versioning --bucket aws-devops-course-stephane --versioning-configuration Status=Enabled --region eu-west-1 --profile aws-devops
+aws s3api put-bucket-versioning --bucket <your-bucket> --versioning-configuration Status=Enabled --region us-east-1
 ```
 
 # deploy the files into S3
 ```
-aws deploy push --application-name CodeDeployDemo --s3-location s3://aws-devops-course-stephane/codedeploy-demo/app.zip --ignore-hidden-files --region eu-west-1 --profile aws-devops
+aws deploy push --application-name CodeDeployDemo --s3-location s3://<your-bucket>/codedeploy-demo/app.zip --ignore-hidden-files --region us-east-1 
 ```
