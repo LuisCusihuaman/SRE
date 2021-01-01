@@ -1,0 +1,29 @@
+# read more at: https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters.html
+
+
+# this will pickup the latest value of the parameter every time the template is run
+# the parameter value must be the Key for that Parameter. Then CFN will retrieve the value
+# this does not support SecureString SSM Parameter types
+Parameters:
+  LatestLinuxAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    # obtain list with
+    # aws ssm get-parameters-by-path --path /aws/service/ami-amazon-linux-latest  --query 'Parameters[].Name'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  # this works for Windows too
+  LatestWindowsAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    # obtain list with
+    # aws ssm get-parameters-by-path --path "/aws/service/ami-windows-latest" --region us-east-1
+    Default: '/aws/service/ami-windows-latest/Windows_Server-2016-English-Core-Base'
+
+Resources:
+  # this instance will be automatically updated 
+  # when AWS releases a new AMI
+  # and then run the CloudFormation template
+  MyInstanceWithParameters:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestLinuxAmiId
+      InstanceType: t2.micro

@@ -1,0 +1,21 @@
+# this will pickup the latest value of the parameter every time the template is run
+# the parameter value must be the Key for that Parameter. Then CFN will retrieve the value
+# this does not support SecureString SSM Parameter types
+Parameters:
+  InstanceType:
+    Type: 'AWS::SSM::Parameter::Value<String>'
+    Default: /EC2/InstanceType
+
+  ImageId: 
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: /EC2/AMI_ID
+
+Resources:
+  # this instance will be automatically updated 
+  # when we change the parameter in SSM ourselves
+  # and then run the CloudFormation template
+  MyInstanceWithParameters:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref ImageId
+      InstanceType: !Ref InstanceType
