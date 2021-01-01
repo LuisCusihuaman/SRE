@@ -2,9 +2,29 @@
 Parameters:
   SSHKey:
     Type: AWS::EC2::KeyPair::KeyName
-    Description: Name of an existing EC2 KP to enabled SSH access
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
 
 Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-2a
+      ImageId: ami-0a0ad6b70e61be944
+      InstanceType: t2.micro
+      KeyName: !Ref SSHKey
+      SecurityGroups:
+        - !Ref SSHSecurityGroup
+      # we install our web server with user data
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash -xe
+          yum update -y
+          yum install -y httpd
+          systemctl start httpd
+          systemctl enable httpd
+          echo "Hello World from user data" > /var/www/html/index.html
+
+  # our EC2 security group
   SSHSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -18,20 +38,3 @@ Resources:
           FromPort: 80
           IpProtocol: tcp
           ToPort: 80
-  MyInstance:
-    Type: AWS::EC2::Instance
-    Properties:
-      AvailabilityZone: us-east-2a
-      ImageId: ami-0a0ad6b70e61be944
-      InstanceType: t2.micro
-      KeyName: !Ref SSHKey
-      SecurityGroups:
-        - !Ref SSHSecurityGroup
-      UserData:
-        Fn::Base64: |
-          #!/bin/bash -xe
-          yum update -y
-          yum install -y httpd
-          systemctl start httpd
-          systemctl enable httpd
-          echo "Hello World from user data" > /var/www/html/index.html
