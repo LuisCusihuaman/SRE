@@ -1,0 +1,24 @@
+Parameters:
+  SSHKey:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+
+Resources:
+  myStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/cloudformation-templates-us-east-1/LAMP_Single_Instance.template
+      Parameters:
+        KeyName: !Ref SSHKey
+        DBName: "mydb"
+        DBUser: "user"
+        DBPassword: "pass"
+        DBRootPassword: "passroot"
+        InstanceType: t2.micro
+        SSHLocation: "0.0.0.0/0"
+
+Outputs:
+  StackRef:
+    Value: !Ref myStack
+  OutputFromNestedStack:
+    Value: !GetAtt myStack.Outputs.WebsiteURL
