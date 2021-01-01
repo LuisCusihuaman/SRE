@@ -1,0 +1,54 @@
+Parameters:
+  S3BucketParam:
+    Type: String
+  S3KeyParam:
+    Type: String
+  S3ObjectVersionParam:
+    Type: String
+
+Resources: 
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - "s3:*"
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - "logs:CreateLogGroup"
+            - "logs:CreateLogStream"
+            - "logs:PutLogEvents"
+            Resource: "*"
+
+  ListBucketsS3Lambda: 
+    Type: "AWS::Lambda::Function"
+    Properties: 
+      Handler: "index.handler"
+      Role: 
+        Fn::GetAtt: 
+          - "LambdaExecutionRole"
+          - "Arn"
+      Runtime: "python3.7"
+      Code: 
+        S3Bucket: 
+          Ref: S3BucketParam
+        S3Key: 
+          Ref: S3KeyParam
+        S3ObjectVersion:
+          Ref: S3ObjectVersionParam
