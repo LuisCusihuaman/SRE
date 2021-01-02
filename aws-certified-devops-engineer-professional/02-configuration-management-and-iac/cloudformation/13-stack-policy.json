@@ -1,0 +1,27 @@
+{
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "Update:*",
+            "Principal": "*",
+            "Resource": "*"
+        },
+        {
+            "Effect": "Deny",
+            "Action": "Update:*",
+            "Principal": "*",
+            "Resource": "LogicalResourceId/CriticalSecurityGroup"
+        },
+        {
+            "Effect" : "Deny",
+            "Action" : "Update:*",
+            "Principal": "*",
+            "Resource" : "*",
+            "Condition" : {
+              "StringEquals" : {
+                "ResourceType" : ["AWS::RDS::DBInstance"]
+              }
+            }
+        }
+    ]
+}

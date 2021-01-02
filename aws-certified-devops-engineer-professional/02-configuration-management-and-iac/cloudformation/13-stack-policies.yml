@@ -1,0 +1,37 @@
+# Read more here: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/protect-stack-resources.html
+
+Parameters:
+  VPCId:
+    Description: VPC to create the security group into
+    Type: AWS::EC2::VPC::Id
+  
+  CidrSSH:
+    Type: String
+    Default: "0.0.0.0/0"
+
+  CidrHTTP:
+    Type: String
+    Default: "0.0.0.0/0"
+
+Resources:
+  SSHSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Test Drift SSH Security Group
+      SecurityGroupIngress:
+        - CidrIp: !Ref CidrSSH
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: tcp
+      VpcId: !Ref VPCId
+
+  CriticalSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: Test Drift HTTP Security Group
+      SecurityGroupIngress:
+        - CidrIp: !Ref CidrHTTP
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: tcp
+      VpcId: !Ref VPCId
