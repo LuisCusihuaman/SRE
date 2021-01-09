@@ -23,15 +23,15 @@ resource "aws_s3_bucket" "bucket_kinesis_data_stream" {
 }
 
 module "ec2" {
-  source = "../ec2"
+  source = "../modules/ec2"
 }
 
 module "kinesis_firehose" {
-  source = "../kinesis"
+  source = "../modules/kinesis"
   bucket_kinesis_data_stream = aws_s3_bucket.bucket_kinesis_data_stream.arn
 }
 
 module "cloudwatch" {
-  source = "../cloudwatch"
+  source = "../modules/cloudwatch"
   kinesis_stream_arn = module.kinesis_firehose.kinesis_firehose_delivery_stream_arn
 }
