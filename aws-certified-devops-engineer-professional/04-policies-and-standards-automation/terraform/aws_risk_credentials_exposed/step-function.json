@@ -1,0 +1,28 @@
+{
+  "Comment": "Deletes exposed IAM access keypairs and notifies security",
+  "StartAt": "DeleteAccessKeyPair",
+  "States": {
+    "DeleteAccessKeyPair": {
+      "Type": "Task",
+      "Resource": "${DeleteAccessKeyPair.Arn}",
+      "Catch": [
+        {
+          "ErrorEquals": [ "ClientError" ],
+          "ResultPath": "$.error-info",
+          "Next": "NotifySecurity"
+        }
+      ],
+      "Next": "LookupCloudTrailEvents"
+    },
+    "LookupCloudTrailEvents": {
+      "Type": "Task",
+      "Resource": "${LookupCloudTrailEvents.Arn}",
+      "Next": "NotifySecurity"
+    },
+    "NotifySecurity": {
+      "Type": "Task",
+      "Resource": "${NotifySecurity.Arn}",
+      "End": true
+    }
+  }
+}

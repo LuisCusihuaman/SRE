@@ -1,0 +1,19 @@
+{
+  "source": [
+    "aws.health"
+  ],
+  "detail-type": [
+    "AWS Health Event"
+  ],
+  "detail": {
+    "service": [
+      "RISK"
+    ],
+    "eventTypeCategory": [
+      "issue"
+    ],
+    "eventTypeCode": [
+      "AWS_RISK_CREDENTIALS_EXPOSED"
+    ]
+  }
+}
