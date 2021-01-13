@@ -1,6 +1,6 @@
 locals {
   TRUSTED_POLICY = <<TRUSTED
-  {
+{
   "Version":"2012-10-17",
   "Statement":[
     {
@@ -12,7 +12,7 @@ locals {
       }
     }
   ]
-  }
+}
   TRUSTED
   STEPFUNCTION_POLICY = <<POLICY
 {
@@ -21,7 +21,7 @@ locals {
         {
             "Effect": "Allow",
             "Action": "states:StartExecution",
-            "Resource": "*"
+            "Resource": "${var.step_function_machine_arn}"
         }
     ]
 }

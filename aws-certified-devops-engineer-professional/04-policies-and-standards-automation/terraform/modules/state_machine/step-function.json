@@ -4,7 +4,7 @@
   "States": {
     "DeleteAccessKeyPair": {
       "Type": "Task",
-      "Resource": "${DeleteAccessKeyPair.Arn}",
+      "Resource": "${DeleteAccessKeyPairArn}",
       "Catch": [
         {
           "ErrorEquals": [ "ClientError" ],
@@ -16,12 +16,12 @@
     },
     "LookupCloudTrailEvents": {
       "Type": "Task",
-      "Resource": "${LookupCloudTrailEvents.Arn}",
+      "Resource": "${LookupCloudTrailEventsArn}",
       "Next": "NotifySecurity"
     },
     "NotifySecurity": {
       "Type": "Task",
-      "Resource": "${NotifySecurity.Arn}",
+      "Resource": "${NotifySecurityArn}",
       "End": true
     }
   }

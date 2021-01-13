@@ -28,7 +28,7 @@ resource "aws_iam_role" "DeleteAccessKeyPairRole" {
   assume_role_policy = local.TRUSTED_POLICY
 }
 resource "aws_iam_role_policy" "DeleteAccessKeyPairPolicy" {
-  name = "DeleteIAMAccessKeyPair"
+  name = "DeleteIAMAccessKeyPairPolicy"
   role = aws_iam_role.DeleteAccessKeyPairRole.id
   policy = data.aws_iam_policy_document.DeleteIAMAccessKeyPair.json
 }
