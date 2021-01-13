@@ -95,4 +95,9 @@ resource "aws_lambda_function" "NotifySecurity" {
   runtime = "python3.6"
   filename = data.archive_file.NotifySecurityZIP.output_path
   source_code_hash = data.archive_file.NotifySecurityZIP.output_base64sha256
+  environment {
+    variables = {
+      TOPIC_ARN = var.notification_topic_arn
+    }
+  }
 }
