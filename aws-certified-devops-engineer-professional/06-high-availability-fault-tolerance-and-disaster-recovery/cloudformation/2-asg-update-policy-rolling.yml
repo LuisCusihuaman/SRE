@@ -1,0 +1,48 @@
+Parameters:
+  LatestLinuxAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+Resources: 
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones: 
+        Fn::GetAZs: 
+          Ref: "AWS::Region"
+      LaunchConfigurationName:
+        Ref: LaunchConfig
+      DesiredCapacity: '3'
+      MinSize: '1'
+      MaxSize: '4'
+    CreationPolicy:
+      ResourceSignal:
+        Count: '3'
+        Timeout: PT15M
+    UpdatePolicy:
+      AutoScalingRollingUpdate:
+        MinInstancesInService: '1'
+        MaxBatchSize: '2'
+        # how much time to wait for the signal
+        PauseTime: PT1M
+        WaitOnResourceSignals: 'true'
+        # we can suspend processes during the update
+        # SuspendProcesses:
+        # - list of processes...
+      AutoScalingScheduledAction:
+        # Prevent Scheduled Actions from modifying min/max/desired for CloudFormation
+        IgnoreUnmodifiedGroupSizeProperties: 'true'
+      
+        
+  LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref LatestLinuxAmiId
+      InstanceType: t2.micro
+      UserData:
+        "Fn::Base64":
+          !Sub |
+            #!/bin/bash -xe
+            echo "hello world 2"
+            yum update -y aws-cfn-bootstrap
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}

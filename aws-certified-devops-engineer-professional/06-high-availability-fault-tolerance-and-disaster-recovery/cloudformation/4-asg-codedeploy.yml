@@ -1,0 +1,60 @@
+Parameters:
+  LatestLinuxAmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+
+  IAMRoleARN:
+    Type: 'String'
+    Description: 'IAM Role ARN for your EC2 instances'
+
+  VPCId:
+    Type: 'AWS::EC2::VPC::Id'
+Resources:
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AvailabilityZones:
+        Fn::GetAZs:
+          Ref: "AWS::Region"
+      LaunchConfigurationName:
+        Ref: LaunchConfig
+      DesiredCapacity: '1'
+      MinSize: '1'
+      MaxSize: '4'
+    CreationPolicy:
+      ResourceSignal:
+        Count: '1'
+        Timeout: PT15M
+
+  LaunchConfig:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref LatestLinuxAmiId
+      InstanceType: t2.micro
+      IamInstanceProfile: !Ref IAMRoleARN
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      UserData:
+        "Fn::Base64":
+          !Sub |
+          #!/bin/bash -xe
+          yum update -y aws-cfn-bootstrap
+          # install codedeploy agent
+          sudo yum update -y
+          sudo yum install -y ruby wget
+          wget https://aws-codedeploy-eu-west-1.s3.eu-west-1.amazonaws.com/latest/install
+          chmod +x ./install
+          sudo ./install auto
+          # signal success
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId: !Ref VPCId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
