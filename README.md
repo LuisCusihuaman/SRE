@@ -39,3 +39,5 @@
         - 📂 [**test**](https://github.com/LuisCusihuaman/SRE/tree/master/terraform-up-and-running/07-testing-terraform-code/test)
     - 📂 **08\-terraform\-team**
         - 📂 [**live/stage/services/hello-world-app**](https://github.com/LuisCusihuaman/SRE/tree/master/terraform-up-and-running/08-terraform-team/live/stage/services/hello-world-app)
+- 📂 **practical-ansible-2**    
+    - 📂 [**01-getting-started-with-ansible**](https://github.com/LuisCusihuaman/SRE/tree/master/practical-ansible-2/01-getting-started-with-ansible)
