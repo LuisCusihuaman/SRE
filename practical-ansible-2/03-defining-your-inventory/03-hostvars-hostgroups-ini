@@ -1,0 +1,7 @@
+[frontends]
+frt01.example.com https_port=8444
+frt02.example.com
+
+[frontends:vars]
+https_port=8433
+lb_vip=lb.example

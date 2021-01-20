@@ -1,0 +1,20 @@
+all:
+  hosts:
+    loadbalancer.example.com
+  children:
+    centos:
+      children:
+        apps:
+          hosts:
+            app01.example.com:
+            app02.example.com:
+        databases:
+          hosts:
+            dbms01.example.com:
+            dbms02.example.com:
+        ubuntu:
+          children:
+            frontends:
+              hosts:
+                frt01.example.com:
+                frt02.example.com:

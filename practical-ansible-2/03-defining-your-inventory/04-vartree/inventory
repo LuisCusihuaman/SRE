@@ -1,0 +1,13 @@
+loadbalancer.example.com
+
+[frontends]
+frt01.example.com
+frt02.example.com
+
+[apps]
+app01.example.com
+app02.example.com
+
+[databases]
+dbms01.example.com
+dbms02.example.com
