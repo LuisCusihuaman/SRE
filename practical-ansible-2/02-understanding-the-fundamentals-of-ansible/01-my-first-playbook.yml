@@ -1,0 +1,16 @@
+---
+- name: My first Ansible playbook
+  hosts: frontends
+  become: yes
+  tasks:
+    - name: Update the latest of Apache Web Server
+      apt:
+        name: apache2
+        state: latest
+      notify:
+        - Restart an Apache Web Server
+  handlers:
+    - name: Restart an Apache Web Server
+      service:
+        name: apache2
+        state: restarted

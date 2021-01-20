@@ -1,0 +1,13 @@
+---
+# ansible-playbook --private-key ~/.ssh/ansible 03-playbook-with-variables.yml
+- name: Display redis variables
+  hosts: localhost
+  vars:
+    redis:
+      server: cacheserver01.example.com
+      port: 6379
+      slaveof: cacheserver02.example.com
+  tasks:
+    - name: Display the redis port
+      debug:
+        msg: "The redis port of {{ redis.server }} is {{ redis.port }}"

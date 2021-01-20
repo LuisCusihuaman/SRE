@@ -1,0 +1,3 @@
+---
+- import_playbook: frontends-na.yml
+- import_playbook: appservers-emea.yml

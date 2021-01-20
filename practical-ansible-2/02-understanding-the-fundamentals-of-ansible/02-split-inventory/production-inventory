@@ -1,0 +1,15 @@
+[frontends_na_zone] 
+frontend1-na.example.com 
+frontend2-na.example.com
+
+[frontends_emea_zone]
+frontend1-emea.example.com
+frontend2-emea.example.com
+
+[appservers_na_zone]
+appserver1-na.example.com
+appserver2-na.example.com
+
+[appservers_emea_zone]
+appserver1-emea.example.com
+appserver2-emea.example.com

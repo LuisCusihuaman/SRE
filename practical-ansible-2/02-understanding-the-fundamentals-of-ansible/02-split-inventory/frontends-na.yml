@@ -1,0 +1,6 @@
+---
+- hosts: frontends_na_zone
+  remote_user: danieloh
+  tasks:
+    - name: simple connection test
+      ping:

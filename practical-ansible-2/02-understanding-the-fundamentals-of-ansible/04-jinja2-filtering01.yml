@@ -1,0 +1,12 @@
+---
+- name: Jinja2 filtering demo1
+  hosts: localhost
+  tasks:
+    - copy:
+        src: 04-multiple-document-strings.yml
+        dest: /tmp/04-multiple-document-strings.yml
+    - shell: cat /tmp/04-multiple-document-strings.yml
+      register: result
+    - debug:
+        msg: '{{ item }}'
+      loop: '{{ result.stdout | from_yaml_all | list }}'

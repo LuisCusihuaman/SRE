@@ -1,0 +1,12 @@
+---
+- name: Jjinja2 filtering demo 2
+  hosts: localhost
+  vars:
+    tags:
+      - key: job
+        value: developer
+      - key: language
+        value: java
+  tasks:
+    - debug:
+        msg: '{{ tags | items2dict }}'
