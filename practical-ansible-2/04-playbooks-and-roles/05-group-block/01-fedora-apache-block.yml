@@ -1,0 +1,22 @@
+---
+- name: Conditional block play
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Install and configure Apache
+      block:
+        - name: Install the Apache package
+          dnf:
+            name: httpd
+            state: installed
+        - name: Install the templated configuration to a dummy location
+          template:
+            src: template/example.j2
+            dest: /tmp/my.conf
+        - name: Start the httpd service
+          service:
+            name: httpd
+            state: started
+            enabled: True
+      when: ansible_facts['distribution'] == 'Fedora'

@@ -1,0 +1,9 @@
+---
+- name: Install Apache using apt
+  apt:
+    name: "apache2"
+    state: latest
+- name: Start the Apache server
+  service:
+    name: apache2
+    state: started

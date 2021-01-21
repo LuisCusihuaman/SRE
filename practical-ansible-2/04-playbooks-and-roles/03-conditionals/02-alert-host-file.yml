@@ -1,0 +1,14 @@
+---
+- name: Play to patch only CentOS systems
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Gather directory listing from local system
+      shell: "ls -l"
+      register: shellresult
+
+    - name: Alert if we find a hosts file
+      debug:
+        msg: "Found hosts file!"
+      when: '"hosts" in shellresult.stdout'

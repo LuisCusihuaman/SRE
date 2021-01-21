@@ -1,0 +1,9 @@
+---
+- name: Install Apache using yum
+  yum:
+    name: "httpd"
+    state: latest
+- name: Start the Apache server
+  service:
+    name: httpd
+    state: started

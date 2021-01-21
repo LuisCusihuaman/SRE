@@ -1,0 +1,4 @@
+---
+- name: Print type variable
+  debug:
+    var: type

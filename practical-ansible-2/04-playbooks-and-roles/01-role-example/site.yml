@@ -1,0 +1,7 @@
+---
+- name: Install Apache using a role
+  hosts: frontends
+  become: true
+
+  roles:
+    - installapache

@@ -1,0 +1,28 @@
+---
+- name: Play to demostrate block error handling
+  hosts: localhost
+
+  tasks:
+    - name: block to handle errors
+      block:
+        - name: Perform a successful task
+          debug:
+            msg: 'Normally executing...'
+        - name: Deliberately create an error
+          command: /bin/whatever
+        - name: This task should not run if the previous one results in an error
+          debug:
+            msg: 'Never print this message if the above command fails!!!!'
+      rescue:
+        - name: Catch the error (and perform recovery actions)
+          debug:
+            msg: 'Caught the error'
+        - name: Deliberately create another error
+          command: /bin/whatever
+        - name: This task shouldn't run if the previous one results in an error
+          debug:
+            msg: 'Do not print this message if the above command fails!!!'
+      always:
+        - name: This task always runs!
+          debug:
+            msg: "Task in this part of the play will be ALWAYS executed!!!!"

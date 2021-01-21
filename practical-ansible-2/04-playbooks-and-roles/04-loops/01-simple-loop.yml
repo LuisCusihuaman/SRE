@@ -1,0 +1,20 @@
+# $ ansible-playbook 01-simple-loop.yml
+---
+- name: Simple loop demo play
+  hosts: localhost
+  tasks:
+    - name: Echo a value from the loop
+      command: echo "{{ item }}"
+      loop:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+      when: item|int > 3
+      register: loopresult
+
+    - name: Print the results from the loop
+      debug:
+        var: loopresult

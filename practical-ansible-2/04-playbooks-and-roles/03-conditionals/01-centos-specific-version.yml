@@ -1,0 +1,13 @@
+---
+- name: Play to patch only CentOS systems
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Path CentOS systems
+      yum:
+        name: httpd
+        state: latest
+      when: >
+      ansible_facts['distribution'] == "CentOS" and
+      ansible_facts[distribition_mayor_version'] == "6"
