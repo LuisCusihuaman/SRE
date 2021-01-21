@@ -1,0 +1,7 @@
+# ansible-playbook -i inventories/idevelopment/hosts site.yml
+# ansible-playbook -i inventories/production/hosts site.yml
+---
+- name: Play using best practise directory structure
+  hosts: all
+  roles:
+    - installapp

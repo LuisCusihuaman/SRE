@@ -1,0 +1,22 @@
+---
+- name: Display http_port variable contents
+  debug:
+    var: http_port
+
+- name: Create /tmp/foo
+  file:
+    path: /tmp/foo
+    state: file
+
+- name: Use custom module to copy /tmp/foo
+  remote_filecopy:
+    source: /tmp/foo
+    dest: /tmp/bar
+
+- name: Define a fact about automation
+  set_fact:
+    about_automation: "Puppet is an excccellent automation tool"
+
+- name: Tell us about automation with a custom filter applied
+  debug:
+    msg: "{{ about_automation | improve_automation }}"
