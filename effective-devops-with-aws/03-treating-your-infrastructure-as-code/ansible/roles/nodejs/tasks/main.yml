@@ -1,0 +1,16 @@
+---
+# tasks file for nodejs
+- name: Download nodejs installer
+  get_url:
+    url: https://rpm.nodesource.com/setup_10.x
+    dest: /tmp/setup_10_nodejs.sh
+    mode: u+x
+- name: Setup Nodejs repository
+  shell: /tmp/setup_10_nodejs.sh
+- name: Clean Nodejs script
+  file:
+    path: /tmp/setup_10_nodejs.sh
+    state: absent
+- name: Install Nodejs
+  yum:
+    name: nodejs
