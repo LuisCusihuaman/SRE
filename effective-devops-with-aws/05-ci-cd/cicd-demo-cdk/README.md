@@ -32,17 +32,32 @@ aws ec2 import-key-pair \
 chmod 400 ~/.ssh/ansible.pub
 
 # GITHUB TOKEN FOR CODEPIPELINE
-aws ssm put-parameter \
-    --name "my-github-token" \
-    --value "YOUT_GITHUB_TOKEN_FOR_CICD" \
-    --type "SecureString"
 
+aws secretsmanager create-secret --name myGithubToken \
+          --description "Basic Create Secret" --secret-string "b923512c25f5b6c4c4fd011fc72d84939d990785"
 ```
 
 # Step 2 - Deploy
 
 ```
-./node_modules/aws-cdk/bin/cdk deploy HelloWorldCdkStack --parameters myPublicIP=$MY_PUBLIC_IP --parameters keyPair=ansible
+cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION
+
+./node_modules/aws-cdk/bin/cdk deploy  InstanceStack\
+    --parameters myPublicIP=$MY_PUBLIC_IP --parameters keyPair=ansible
+
+ ./node_modules/aws-cdk/bin/cdk deploy BucketArtifactStack \
+ --parameters ArtifactCICDBucketNAME="aws-cusihuaman-dev-artifacts"
+
+ ./node_modules/aws-cdk/bin/cdk deploy CodeBuildStack \
+ --parameters nodejsAppRelativePath="effective-devops-with-aws/05-ci-cd/helloworld"
+
+ ./node_modules/aws-cdk/bin/cdk deploy CodeDeployStack
+
+ ./node_modules/aws-cdk/bin/cdk deploy CodePipelineStack \
+  --parameters githubAccountName="LuisCusihuaman" \
+  --parameters repoGithubName="SRE" \
+  --parameters repoBranchName="cicd_demo_cdk"
+  
 ```
 
 # Step 3 - Test
@@ -58,6 +73,7 @@ Hello World
 # Destroy
 
 ```
+
 ./node_modules/aws-cdk/bin/cdk destroy HelloWorldCdkStack
 
 aws ec2 delete-key-pair --key-name ansible
@@ -72,3 +88,12 @@ https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ssm-
 You can't create ec2 key pair from Cloudformation, cdk either:
 
 https://github.com/aws/aws-cdk/issues/5252
+
+Webhook github outh only accept secret manager and not ssm parameter store:
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codepipeline-webhook-webhookauthconfiguration.html
+
+Github token:
+https://docs.aws.amazon.com/codepipeline/latest/userguide/appendix-github-oauth.html#GitHub-create-personal-token-CLI
+
+AWS DOCS:
+https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-four-stage-pipeline.html#tutorials-four-stage-pipeline-prerequisites-jenkins-iam-role

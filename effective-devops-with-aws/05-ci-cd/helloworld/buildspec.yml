@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 10
+    commands:
+      - echo "installing nodejs dependencies"
+      - npm install
+  build:
+    commands:
+      - echo "we will run some tests"
+      - ./node_modules/mocha/bin/mocha
+  post_build:
+    commands:
+      - echo "we are in the post build phase"
+      - npm prune
+      - rm -rf node_modules
+  artifacts:
+    files:
+      - $nodejsAppRelativePath/**/*

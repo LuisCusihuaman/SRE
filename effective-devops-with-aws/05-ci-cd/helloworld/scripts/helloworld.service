@@ -1,0 +1,13 @@
+[Unit]
+Description=helloworld.js
+Documentation=https://github.com/LuisCusihuaman/SRE/tree/master/effective-devops-with-aws/03-treating-your-infrastructure-as-code/hello-world-cdk
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+ExecStart=/usr/bin/node /usr/local/helloworld/helloworld.js
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

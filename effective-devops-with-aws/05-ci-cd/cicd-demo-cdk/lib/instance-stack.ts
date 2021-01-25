@@ -3,10 +3,10 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import { AmazonLinuxGeneration } from '@aws-cdk/aws-ec2';
 import { CfnOutput, CfnParameter } from '@aws-cdk/core';
 
-export class JenkinsStack extends cdk.Stack {
+export class InstanceStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    const ApplicationPort = 8080;
+    const ApplicationPort = 3000;
 
     const myPublicIP = new CfnParameter(this, 'myPublicIP', {
       type: 'String',
@@ -17,6 +17,9 @@ export class JenkinsStack extends cdk.Stack {
       description:
         'Name of an existing EC2 KeyPair to enable SSH access to the instance',
     });
+    const userDataREPO = 'https://github.com/luiscusihuaman/sre';
+    const ansiblePlaybook =
+      'effective-devops-with-aws/05-ci-cd/ansible/bootstrap-server.yml';
 
     const vpc = ec2.Vpc.fromLookup(this, 'VPC', { isDefault: true });
     const ec2SecurityGroup = new ec2.SecurityGroup(this, 'ec2SecurityGroup', {
@@ -39,9 +42,6 @@ export class JenkinsStack extends cdk.Stack {
     const amazonLinuxImage = new ec2.AmazonLinuxImage({
       generation: AmazonLinuxGeneration.AMAZON_LINUX_2,
     });
-    const userDataREPO = 'https://github.com/luiscusihuaman/sre';
-    const ansiblePlaybook =
-      'effective-devops-with-aws/05-ci-cd/ansible/jenkins.yml';
 
     const ec2Instance = new ec2.Instance(this, 'Instance', {
       keyName: keyPair.valueAsString,
@@ -62,10 +62,10 @@ export class JenkinsStack extends cdk.Stack {
       }),
     });
 
-    new CfnOutput(this, 'JenkinsServerURL', {
-      value: `${ec2Instance.instancePublicIp}:${ApplicationPort}`,
-      description: 'Jenkins server URL of my jenkins master',
-      exportName: 'JenkinsServerURL',
+    new CfnOutput(this, 'publicIP', {
+      value: ec2Instance.instancePublicIp,
+      description: 'public ip of my ec2 instance',
+      exportName: 'yourPublicEC2IP',
     });
   }
 }

@@ -21,10 +21,12 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-codebuild": "^1.86.0",
     "@aws-cdk/aws-codedeploy": "^1.86.0",
     "@aws-cdk/aws-codepipeline": "^1.86.0",
     "@aws-cdk/aws-codepipeline-actions": "^1.86.0",
     "@aws-cdk/aws-ec2": "^1.86.0",
+    "@aws-cdk/aws-iam": "^1.86.0",
     "@aws-cdk/aws-s3": "^1.86.0",
     "@aws-cdk/core": "1.86.0",
     "i": "^0.3.6",
