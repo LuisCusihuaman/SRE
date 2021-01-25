@@ -1,6 +1,14 @@
 ---
 - hosts: localhost
   become: true
+  tasks:
+    - name: Install ruby for codedeploy dependency
+      yum:
+        name: ruby
+        state: installed
+
+- hosts: localhost
+  become: true
   roles:
-    - nodejs
     - codedeploy
+    - nodejs
