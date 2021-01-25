@@ -1,0 +1,9 @@
+---
+# tasks file for codedeploy
+- name: Download codedeploy agent installer
+  get_url:
+    url: https://aws-codedeploy-eu-west-1.s3.eu-west-1.amazonaws.com/latest/install
+    dest: /tmp/install
+    mode: u+x
+- name: Install codedeploy agent
+  shell: /tmp/install auto
