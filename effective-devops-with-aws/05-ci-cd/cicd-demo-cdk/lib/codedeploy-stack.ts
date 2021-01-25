@@ -8,7 +8,7 @@ export class CodeDeployStack extends cdk.Stack {
     const codeDeployDemo = new codedeploy.ServerApplication(this, 'codeDeployDemo', {
       applicationName: 'codeDeployDemo',
     });
-    const codeDeployDemoGroup = new codedeploy.ServerDeploymentGroup(this, 'codeDeployDemoGroup', {
+    const codeDeployDemoGroup = new codedeploy.ServerDeploymentGroup(this, 'serverCodeDeployDemoGroup', {
       application: codeDeployDemo,
       deploymentGroupName: 'codeDeployDemoGroup',
       ec2InstanceTags: new codedeploy.InstanceTagSet({
