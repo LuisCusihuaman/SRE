@@ -4,6 +4,7 @@ import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import * as codedeploy from '@aws-cdk/aws-codedeploy';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as codebuild from '@aws-cdk/aws-codebuild';
+import * as iam from '@aws-cdk/aws-iam';
 
 export class CodePipelineStack extends cdk.Stack {
   private boostrapGithubActionPipeline() {
@@ -22,7 +23,7 @@ export class CodePipelineStack extends cdk.Stack {
       description: 'Your target branch name',
     });
 
-    const sourceOutput = new codepipeline.Artifact('source_output');
+    const sourceOutput = new codepipeline.Artifact('SourceOut');
 
     return new codepipeline_actions.GitHubSourceAction({
       oauthToken: oauth,
@@ -37,8 +38,8 @@ export class CodePipelineStack extends cdk.Stack {
   private boostrapCodeBuildAction() {
     return new codepipeline_actions.CodeBuildAction({
       actionName: 'Build',
-      input: new codepipeline.Artifact('source_output'),
-      outputs: [new codepipeline.Artifact('build_output')],
+      input: new codepipeline.Artifact('SourceOut'),
+      outputs: [new codepipeline.Artifact('BuildOut')],
       project: codebuild.Project.fromProjectArn(
         this,
         'codebuildProject',
@@ -50,7 +51,7 @@ export class CodePipelineStack extends cdk.Stack {
   private boostrapCodeDeployActionPipeline() {
     return new codepipeline_actions.CodeDeployServerDeployAction({
       actionName: 'CodeDeploy',
-      input: new codepipeline.Artifact('build_output'),
+      input: new codepipeline.Artifact('BuildOut'),
       deploymentGroup: codedeploy.ServerDeploymentGroup.fromServerDeploymentGroupAttributes(
         this,
         'codeDeployDemoGroup',
@@ -75,11 +76,24 @@ export class CodePipelineStack extends cdk.Stack {
       cdk.Fn.importValue('ArtifactCICDBucketNAME'),
     );
 
+    const codePipelineRole = new iam.Role(this, 'codePipelineRole', {
+      assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
+    });
+
+    codePipelineRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodePipelineFullAccess'),
+    );
+
+    codePipelineRole.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
+    );
+
     const codePipelineDemo = new codepipeline.Pipeline(
       this,
-      'codePipelineDemo',
+      'cicdDemo',
       {
-        pipelineName: 'codePipelineDemo',
+        role: codePipelineRole,
+        pipelineName: 'cicdDemo',
         artifactBucket,
         stages: [
           {

@@ -42,7 +42,7 @@ aws secretsmanager create-secret --name myGithubToken \
 ```
 cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION
 
-./node_modules/aws-cdk/bin/cdk deploy  InstanceStack\
+./node_modules/aws-cdk/bin/cdk deploy InstanceStack\
     --parameters myPublicIP=$MY_PUBLIC_IP --parameters keyPair=ansible
 
  ./node_modules/aws-cdk/bin/cdk deploy BucketArtifactStack \

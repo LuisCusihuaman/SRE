@@ -13,7 +13,7 @@ phases:
   build:
     commands:
       - echo "we will run some tests"
-      - ./node_modules/mocha/bin/mocha
+      - ./node_modules/mocha/bin/mocha --exit
   post_build:
     commands:
       - echo "we are in the post build phase"
@@ -21,4 +21,5 @@ phases:
       - rm -rf node_modules
 artifacts:
   files:
-    - '$nodejsAppRelativePath/**/*'
+    - '**/*'
+  base-directory: $nodejsAppRelativePath
