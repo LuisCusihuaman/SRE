@@ -11,4 +11,4 @@
   become: true
   roles:
     - codedeploy
-    - nodejs
+    - helloworld
