@@ -5,6 +5,8 @@ import * as codedeploy from '@aws-cdk/aws-codedeploy';
 import * as s3 from '@aws-cdk/aws-s3';
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as iam from '@aws-cdk/aws-iam';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export class CodePipelineStack extends cdk.Stack {
   private boostrapGithubActionPipeline() {
@@ -80,36 +82,33 @@ export class CodePipelineStack extends cdk.Stack {
       assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
     });
 
-    codePipelineRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodePipelineFullAccess'),
-    );
+    const pathPolicy = path.join(__dirname, 'codepipeline_policy.json');
+    const policyDocument = JSON.parse(fs.readFileSync(pathPolicy, 'utf8'));
 
-    codePipelineRole.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
-    );
+    const customPolicyDocument = iam.PolicyDocument.fromJson(policyDocument);
+    const newManagedPolicy = new iam.ManagedPolicy(this, 'MyNewManagedPolicy', {
+      document: customPolicyDocument,
+    });
+    codePipelineRole.addManagedPolicy(newManagedPolicy);
 
-    const codePipelineDemo = new codepipeline.Pipeline(
-      this,
-      'cicdDemo',
-      {
-        role: codePipelineRole,
-        pipelineName: 'cicdDemo',
-        artifactBucket,
-        stages: [
-          {
-            stageName: 'Source',
-            actions: [this.boostrapGithubActionPipeline()],
-          },
-          {
-            stageName: 'Build',
-            actions: [this.boostrapCodeBuildAction()],
-          },
-          {
-            stageName: 'Deploy',
-            actions: [this.boostrapCodeDeployActionPipeline()],
-          },
-        ],
-      },
-    );
+    const codePipelineDemo = new codepipeline.Pipeline(this, 'cicdDemo', {
+      role: codePipelineRole,
+      pipelineName: 'cicdDemo',
+      artifactBucket,
+      stages: [
+        {
+          stageName: 'Source',
+          actions: [this.boostrapGithubActionPipeline()],
+        },
+        {
+          stageName: 'Build',
+          actions: [this.boostrapCodeBuildAction()],
+        },
+        {
+          stageName: 'Deploy',
+          actions: [this.boostrapCodeDeployActionPipeline()],
+        },
+      ],
+    });
   }
 }

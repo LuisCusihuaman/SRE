@@ -46,7 +46,7 @@ cdk bootstrap aws://$ACCOUNT_ID/$AWS_REGION
     --parameters myPublicIP=$MY_PUBLIC_IP --parameters keyPair=ansible
 
  ./node_modules/aws-cdk/bin/cdk deploy BucketArtifactStack \
- --parameters ArtifactCICDBucketNAME="aws-cusihuaman-dev-artifacts"
+ --parameters ArtifactCICDBucketNAME="aws-artifacts"
 
  ./node_modules/aws-cdk/bin/cdk deploy CodeBuildStack \
  --parameters nodejsAppRelativePath="effective-devops-with-aws/05-ci-cd/helloworld"

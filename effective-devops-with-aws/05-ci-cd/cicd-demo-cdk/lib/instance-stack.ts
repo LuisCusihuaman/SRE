@@ -2,6 +2,7 @@ import * as cdk from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import { AmazonLinuxGeneration } from '@aws-cdk/aws-ec2';
 import { CfnOutput, CfnParameter } from '@aws-cdk/core';
+import * as iam from '@aws-cdk/aws-iam';
 
 export class InstanceStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -43,9 +44,20 @@ export class InstanceStack extends cdk.Stack {
       generation: AmazonLinuxGeneration.AMAZON_LINUX_2,
     });
 
+    const ec2Role = new iam.Role(this, 'ec2Role', {
+      assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+    });
+
+    ec2Role.addManagedPolicy(
+      iam.ManagedPolicy.fromAwsManagedPolicyName(
+        'AmazonEC2RoleforAWSCodeDeploy',
+      ),
+    );
+
     const ec2Instance = new ec2.Instance(this, 'Instance', {
       keyName: keyPair.valueAsString,
       vpc,
+      role: ec2Role,
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.T2,
         ec2.InstanceSize.MICRO,
