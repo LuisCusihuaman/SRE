@@ -40,6 +40,7 @@ export class CodeBuildStack extends cdk.Stack {
             type: codebuild.BuildEnvironmentVariableType.PLAINTEXT,
           },
         },
+        buildSpec: codebuild.BuildSpec.fromSourceFilename(`${nodejsAppRelativePath.valueAsString}/buildspec.yml`)
       },
     );
 

@@ -1,11 +1,14 @@
 version: 0.2
 
 phases:
+
   install:
     runtime-versions:
       nodejs: 10
     commands:
+      - cd $nodejsAppRelativePath
       - echo "installing nodejs dependencies"
+      - ls -lth
       - npm install
   build:
     commands:
@@ -16,6 +19,6 @@ phases:
       - echo "we are in the post build phase"
       - npm prune
       - rm -rf node_modules
-  artifacts:
-    files:
-      - $nodejsAppRelativePath/**/*
+artifacts:
+  files:
+    - '$nodejsAppRelativePath/**/*'

@@ -12,7 +12,7 @@ Requirements:
 ```
 MY_PUBLIC_IP=$(curl -s http://whatismijnip.nl |cut -d " " -f 5)/32
 
-export ACCOUNT_ID=”XXXXXXXXXXXX" AWS_REGION=”us-east-2"
+export ACCOUNT_ID=”XXXXXXXXXXXX" AWS_REGION="YOUR_REGION"
 
 npm install
 ```
@@ -34,7 +34,7 @@ chmod 400 ~/.ssh/ansible.pub
 # GITHUB TOKEN FOR CODEPIPELINE
 
 aws secretsmanager create-secret --name myGithubToken \
-          --description "Basic Create Secret" --secret-string "b923512c25f5b6c4c4fd011fc72d84939d990785"
+          --description "Basic Create Secret" --secret-string "YOUR_GITHUB_ACCESS_TOKEN"
 ```
 
 # Step 2 - Deploy
