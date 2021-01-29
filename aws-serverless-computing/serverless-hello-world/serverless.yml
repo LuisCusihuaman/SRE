@@ -1,0 +1,48 @@
+service: serverless-hello-world
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /hello
+          method: get
+
+resources:
+  Resources:
+    photosMetadataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: photos-metadata
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+          - AttributeName: FILENAME
+            AttributeType: S
+          - AttributeName: FOCAL_LENGTH
+            AttributeType: N
+          - AttributeName: CAMERA_MAKE
+            AttributeType: S
+          - AttributeName: FLASH_FIRED
+            AttributeType: BOOL
+        custom:
+          dynamodb:
+            stages:
+              - dev
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-offline
+  - serverless-dynamodb-local
+  - serverless-mocha-plugin
