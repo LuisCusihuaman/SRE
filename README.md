@@ -8,7 +8,7 @@
 
 ## 🚀 Projects Structure
 
- - 📂 **aws\-certified\-devops\-engineer\-professional**
+ - 📂 [**aws\-certified\-devops\-engineer\-professional**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional)
     - 📂 [**01\-sdlc\-automation\/terraform/cicd-demo**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/01-sdlc-automation/terraform/cicd-demo) 
     - 📂 **02\-configuration\-management\-and\-iac**
         - 📂 [**cloudformation**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/02-configuration-management-and-iac/cloudformation)

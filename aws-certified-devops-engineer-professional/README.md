@@ -25,6 +25,7 @@
 3.  Apply concepts required to automate and integrate testing
 4.  Apply concepts required to build and manage artifacts securely
 5.  Determine deployment/delivery strategies (e.g., A/B, Blue/green, Canary, Red/black) and how to implement them using AWS Services
+- 📂 [**01\-sdlc\-automation\/terraform/cicd-demo**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/01-sdlc-automation/terraform/cicd-demo)
 
 **Domain 2: Configuration Management and Infrastructure as Code**
 
@@ -33,6 +34,10 @@
 3.  Apply security concepts in the automation of resource provisioning
 4.  Determine how to implement lifecycle hooks on a deployment
 5.  Apply concepts required to manage systems using AWS configuration management tools and services
+- 📂 **02\-configuration\-management\-and\-iac**
+  - 📂 [**cloudformation**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/02-configuration-management-and-iac/cloudformation)
+  - 📂 [**elasticbeanstalk/HelloWorld**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/02-configuration-management-and-iac/elasticbeanstalk/HelloWorld)
+  - 📂 [**lambda**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/02-configuration-management-and-iac/lambda)
 
 **Domain 3: Monitoring and Logging**
 
@@ -40,12 +45,14 @@
 2.  Apply concepts required to automate monitoring and event management of an environment
 3.  Apply concepts required to audit, log, and monitor operating systems, infrastructures, and applications
 4.  Determine how to implement tagging and other metadata strategies
+- 📂 [**03\-monitoring\-and\-logging/terraform/logging\-demo**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/03-monitoring-and-logging/terraform/logging-demo)
 
 **Domain 4: Policies and Standards Automation**
 
 1.  Apply concepts required to enforce standards for logging, metrics, monitoring, testing, and security
 2.  Determine how to optimize cost through automation
 3.  Apply concepts required to implement governance strategies
+- 📂 [**04\-policies\-and\-standards\-automation/ssm**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/04-policies-and-standards-automation/ssm)
 
 **Domain 5: Incident and Event Response**
 
@@ -53,6 +60,7 @@
 2.  Determine how to automate event management and alerting
 3.  Apply concepts required to implement automated healing
 4.  Apply concepts required to set up event-driven automated actions
+- 📂 [**05\-incident\-and\-event\-response/terraform/aws\-risk\-credentials\-exposed\-demo**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/05-incident-and-event-response/terraform/aws-risk-credentials-exposed-demo)
 
 **Domain 6: High Availability, Fault Tolerance, and Disaster Recovery**
 
@@ -61,3 +69,6 @@
 3.  Determine the right services based on business needs (e.g., RTO/RPO, cost)
 4.  Determine how to design and automate disaster recovery strategies
 5.  Evaluate a deployment for points of failure
+- 📂 **06\-high\-availability\-fault\-tolerance\-and\-disaster\-recovery**
+  - 📂 [**cloudformation**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/06-high-availability-fault-tolerance-and-disaster-recovery/cloudformation)
+  - 📂 [**terraform/modules/asg**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-certified-devops-engineer-professional/06-high-availability-fault-tolerance-and-disaster-recovery/terraform/modules/asg)
