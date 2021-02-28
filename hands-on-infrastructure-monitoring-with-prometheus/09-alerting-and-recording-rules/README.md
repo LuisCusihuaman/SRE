@@ -1,4 +1,4 @@
-# Exporters and integrations
+# Alerting and Recording Rules
 
 ### Step 1 - Setup env
 
