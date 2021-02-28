@@ -100,7 +100,7 @@ spec:
           for: 5m
           labels:
             severity: page
-  ...```
+  ...
 
 ```
 
@@ -117,3 +117,32 @@ minikube service prometheus-service -n monitoring
 # FOR DELETE ALL:
 minikube delete
 ```
+
+### Questions
+1. What happens to the notifications if there's a network partition between Alertmanager instances in the same cluster?
+
+In the case of a network partition, each side of the partition will send notifications for the alerts they are aware of: in a clustering failure scenario, it's better to receive duplicate notifications for an issue than to not get any at all.
+
+2. Can an alert trigger multiple receivers? What is required for that to happen?
+
+By setting continue to true on a route, it will make the matching process keep going through the routing tree until the next match, thereby allowing multiple receivers to be triggered.
+
+3. What's the difference between group_interval and repeat_interval?
+
+The group_interval configuration defines how long to wait for additional alerts in a given alert group (defined by group_by) before sending an updated notification when a new alert is received; repeat_interval defines how long to wait until resending notifications for a given alert group when there are no changes.
+
+4. What happens if an alert does not match any of the configured routes?
+
+The top-level route, also known as the catch-all or fallback route, will trigger a default receiver when incoming alerts aren't matched in other sub-routes.
+
+5. If the notification provider you require is not supported natively by Alertmanager, how can you use it?
+
+The webhook integration allows Alertmanager to issue an HTTP POST request with the JSON payload of the notification to a configurable endpoint. 
+
+6. When writing custom notifications, how are CommonLabels and CommonAnnotations populated?
+
+The `CommonLabels` field is populated with the labels that are common to all alerts in the notification. The `CommonAnnotations` field does exactly the same, but for annotations.
+
+7. What can you do to ensure that the full alerting path is working from end to end?
+
+A good approach is to use a deadman's switch alert: create an alert that is guaranteed to always be firing, and then configure Alertmanager to route that alert to a (hopefully) external system that will be responsible for letting you know whether it ever stops receiving notifications.
