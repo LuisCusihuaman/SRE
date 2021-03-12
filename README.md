@@ -16,7 +16,9 @@ I built production-grade infrastructure with Terraform small, composable, testab
 
 -   📂 [**terraform\-up\-and\-running**](https://github.com/LuisCusihuaman/SRE/tree/master/terraform-up-and-running)
 
-Here information about ansible book
+I automated software provisioning, configuration management and used Ansible as a deployment and orchestration tool.
+
+Following best practices for cloud environment inventories, troubleshooting issues triggered during Ansible playbook runs.
 
 -   📂 [**practical-ansible-2**](https://github.com/LuisCusihuaman/SRE/tree/master/practical-ansible-2)
 
