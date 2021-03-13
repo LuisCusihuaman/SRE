@@ -34,6 +34,8 @@ Build and deploy serverless applications with Amazon API Gateway and AWS Lambda 
 
 -   📂 [**aws-serverless-computing**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-serverless-computing)
 
-Here information about aws-serverless-computing book
+I Integrated Prometheus with Alertmanager and Grafana for building a complete monitoring system.
+
+Exploring PromQL, Prometheus' functional query language, and deploy Prometheus components using Kubernetes and traditional instances
 
 -   📂 [**hands-on-infrastructure-monitoring-with-prometheus**](https://github.com/LuisCusihuaman/SRE/tree/master/hands-on-infrastructure-monitoring-with-prometheus)
