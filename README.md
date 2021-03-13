@@ -22,7 +22,9 @@ Following best practices for cloud environment inventories, troubleshooting issu
 
 -   📂 [**practical-ansible-2**](https://github.com/LuisCusihuaman/SRE/tree/master/practical-ansible-2)
 
-Here information about effective devops book
+I built in AWS Cloud Development Kit a continuous integration and continuous deployment pipeline to keep apps up to date.
+
+Following DevOps principles to take full advantage of the AWS stack and services.
 
 -   📂 [**effective-devops-with-aws**](https://github.com/LuisCusihuaman/SRE/tree/master/effective-devops-with-aws)
 
