@@ -28,7 +28,9 @@ Following DevOps principles to take full advantage of the AWS stack and services
 
 -   📂 [**effective-devops-with-aws**](https://github.com/LuisCusihuaman/SRE/tree/master/effective-devops-with-aws)
 
-Here information about aws-serverless-computing book
+I learned how to write, run, and deploy serverless scalable applications and cost-efficient systems in Amazon Web Services.
+
+Build and deploy serverless applications with Amazon API Gateway and AWS Lambda functions following best practices using Serverless Framework
 
 -   📂 [**aws-serverless-computing**](https://github.com/LuisCusihuaman/SRE/tree/master/aws-serverless-computing)
 
