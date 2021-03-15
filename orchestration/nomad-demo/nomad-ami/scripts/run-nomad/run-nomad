@@ -1,0 +1,410 @@
+#!/bin/bash
+# This script is used to configure and run Nomad on an AWS server.
+
+set -e
+
+readonly NOMAD_CONFIG_FILE="default.hcl"
+readonly SYSTEMD_CONFIG_PATH="/etc/systemd/system/nomad.service"
+
+readonly EC2_INSTANCE_METADATA_URL="http://169.254.169.254/latest/meta-data"
+readonly EC2_INSTANCE_DYNAMIC_DATA_URL="http://169.254.169.254/latest/dynamic"
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly SCRIPT_NAME="$(basename "$0")"
+
+function print_usage {
+  echo
+  echo "Usage: run-nomad [OPTIONS]"
+  echo
+  echo "This script is used to configure and run Nomad on an AWS server."
+  echo
+  echo "Options:"
+  echo
+  echo -e "  --server\t\tIf set, run in server mode. Optional. At least one of --server or --client must be set."
+  echo -e "  --client\t\tIf set, run in client mode. Optional. At least one of --server or --client must be set."
+  echo -e "  --num-servers\t\tThe number of servers to expect in the Nomad cluster. Required if --server is true."
+  echo -e "  --config-dir\t\tThe path to the Nomad config folder. Optional. Default is the absolute path of '../config', relative to this script."
+  echo -e "  --data-dir\t\tThe path to the Nomad data folder. Optional. Default is the absolute path of '../data', relative to this script."
+  echo -e "  --bin-dir\t\tThe path to the folder with Nomad binary. Optional. Default is the absolute path of the parent folder of this script."
+  echo -e "  --systemd-stdout\t\tThe StandardOutput option of the systemd unit.  Optional.  If not configured, uses systemd's default (journal)."
+  echo -e "  --systemd-stderr\t\tThe StandardError option of the systemd unit.  Optional.  If not configured, uses systemd's default (inherit)."
+  echo -e "  --user\t\tThe user to run Nomad as. Optional. Default is to use the owner of --config-dir."
+  echo -e "  --use-sudo\t\tIf set, run the Nomad agent with sudo. By default, sudo is only used if --client is set."
+  echo -e "  --environment\t\A single environment variable in the key/value pair form 'KEY=\"val\"' to pass to Nomad as environment variable when starting it up. Repeat this option for additional variables. Optional."
+  echo -e "  --skip-nomad-config\tIf this flag is set, don't generate a Nomad configuration file. Optional. Default is false."
+  echo
+  echo "Example:"
+  echo
+  echo "  run-nomad --server --config-dir /custom/path/to/nomad/config"
+}
+
+function log {
+  local readonly level="$1"
+  local readonly message="$2"
+  local readonly timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+  >&2 echo -e "${timestamp} [${level}] [$SCRIPT_NAME] ${message}"
+}
+
+function log_info {
+  local readonly message="$1"
+  log "INFO" "$message"
+}
+
+function log_warn {
+  local readonly message="$1"
+  log "WARN" "$message"
+}
+
+function log_error {
+  local readonly message="$1"
+  log "ERROR" "$message"
+}
+
+# Based on code from: http://stackoverflow.com/a/16623897/483528
+function strip_prefix {
+  local readonly str="$1"
+  local readonly prefix="$2"
+  echo "${str#$prefix}"
+}
+
+function assert_not_empty {
+  local readonly arg_name="$1"
+  local readonly arg_value="$2"
+
+  if [[ -z "$arg_value" ]]; then
+    log_error "The value for '$arg_name' cannot be empty"
+    print_usage
+    exit 1
+  fi
+}
+
+function split_by_lines {
+  local prefix="$1"
+  shift
+
+  for var in "$@"; do
+    echo "${prefix}${var}"
+  done
+}
+
+function lookup_path_in_instance_metadata {
+  local readonly path="$1"
+  curl --silent --location "$EC2_INSTANCE_METADATA_URL/$path/"
+}
+
+function lookup_path_in_instance_dynamic_data {
+  local readonly path="$1"
+  curl --silent --location "$EC2_INSTANCE_DYNAMIC_DATA_URL/$path/"
+}
+
+function get_instance_ip_address {
+  lookup_path_in_instance_metadata "local-ipv4"
+}
+
+function get_instance_id {
+  lookup_path_in_instance_metadata "instance-id"
+}
+
+function get_instance_availability_zone {
+  lookup_path_in_instance_metadata "placement/availability-zone"
+}
+
+function get_instance_region {
+  lookup_path_in_instance_dynamic_data "instance-identity/document" | jq -r ".region"
+}
+
+function assert_is_installed {
+  local readonly name="$1"
+
+  if [[ ! $(command -v ${name}) ]]; then
+    log_error "The binary '$name' is required by this script but is not installed or in the system's PATH."
+    exit 1
+  fi
+}
+
+function generate_nomad_config {
+  local readonly server="$1"
+  local readonly client="$2"
+  local readonly num_servers="$3"
+  local readonly config_dir="$4"
+  local readonly user="$5"
+  local readonly config_path="$config_dir/$NOMAD_CONFIG_FILE"
+
+  local instance_id=""
+  local instance_ip_address=""
+  local instance_region=""
+  local instance_availability_zone=""
+
+  instance_id=$(get_instance_id)
+  instance_ip_address=$(get_instance_ip_address)
+  instance_region=$(get_instance_region)
+  availability_zone=$(get_instance_availability_zone)
+
+  local server_config=""
+  if [[ "$server" == "true" ]]; then
+    server_config=$(cat <<EOF
+server {
+  enabled = true
+  bootstrap_expect = $num_servers
+}
+EOF
+)
+  fi
+
+  local client_config=""
+  if [[ "$client" == "true" ]]; then
+    client_config=$(cat <<EOF
+client {
+  enabled = true
+}
+EOF
+)
+  fi
+
+  log_info "Creating default Nomad config file in $config_path"
+  cat > "$config_path" <<EOF
+datacenter = "$availability_zone"
+name       = "$instance_id"
+region     = "$instance_region"
+bind_addr  = "0.0.0.0"
+
+advertise {
+  http = "$instance_ip_address"
+  rpc  = "$instance_ip_address"
+  serf = "$instance_ip_address"
+}
+
+$client_config
+
+$server_config
+
+consul {
+  address = "127.0.0.1:8500"
+}
+EOF
+  chown "$user:$user" "$config_path"
+}
+
+function generate_systemd_config {
+  local readonly systemd_config_path="$1"
+  local readonly nomad_config_dir="$2"
+  local readonly nomad_data_dir="$3"
+  local readonly nomad_bin_dir="$4"
+  local readonly nomad_sytemd_stdout="$5"
+  local readonly nomad_sytemd_stderr="$6"
+  local readonly nomad_user="$7"
+  local readonly use_sudo="$8"
+  shift 8
+  local readonly environment=("$@")
+  local readonly config_path="$nomad_config_dir/$NOMAD_CONFIG_FILE"
+
+  if [[ "$use_sudo" == "true" ]]; then
+    log_info "The --use-sudo flag is set, so running Nomad as the root user"
+    nomad_user="root"
+  fi
+
+  log_info "Creating systemd config file to run Nomad in $systemd_config_path"
+
+  local readonly unit_config=$(cat <<EOF
+[Unit]
+Description="HashiCorp Nomad"
+Documentation=https://www.nomadproject.io/
+Requires=network-online.target
+After=network-online.target
+ConditionalFileNotEmpty=$config_path
+EOF
+)
+
+  local readonly service_config=$(cat <<EOF
+[Service]
+User=$nomad_user
+Group=$nomad_user
+ExecStart=$nomad_bin_dir/nomad agent -config $nomad_config_dir -data-dir $nomad_data_dir
+ExecReload=/bin/kill --signal HUP \$MAINPID
+KillMode=process
+Restart=on-failure
+LimitNOFILE=65536
+$(split_by_lines "Environment=" "${environment[@]}")
+
+EOF
+)
+
+  local log_config=""
+  if [[ ! -z $nomad_sytemd_stdout ]]; then
+    log_config+="StandardOutput=$nomad_sytemd_stdout\n"
+  fi
+  if [[ ! -z $nomad_sytemd_stderr ]]; then
+    log_config+="StandardError=$nomad_sytemd_stderr\n"
+  fi
+
+  local readonly install_config=$(cat <<EOF
+[Install]
+WantedBy=multi-user.target
+EOF
+)
+
+  echo -e "$unit_config" > "$systemd_config_path"
+  echo -e "$service_config" >> "$systemd_config_path"
+  echo -e "$log_config" >> "$systemd_config_path"
+  echo -e "$install_config" >> "$systemd_config_path"
+}
+
+function start_nomad {
+  log_info "Reloading systemd config and starting Nomad"
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable nomad.service
+  sudo systemctl restart nomad.service
+}
+
+# Based on: http://unix.stackexchange.com/a/7732/215969
+function get_owner_of_path {
+  local readonly path="$1"
+  ls -ld "$path" | awk '{print $3}'
+}
+
+function run {
+  local server="false"
+  local client="false"
+  local num_servers=""
+  local config_dir=""
+  local data_dir=""
+  local bin_dir=""
+  local systemd_stdout=""
+  local systemd_stderr=""
+  local user=""
+  local skip_nomad_config="false"
+  local use_sudo=""
+  local environment=()
+  local all_args=()
+
+  while [[ $# > 0 ]]; do
+    local key="$1"
+
+    case "$key" in
+      --server)
+        server="true"
+        ;;
+      --client)
+        client="true"
+        ;;
+      --num-servers)
+        num_servers="$2"
+        shift
+        ;;
+      --config-dir)
+        assert_not_empty "$key" "$2"
+        config_dir="$2"
+        shift
+        ;;
+      --data-dir)
+        assert_not_empty "$key" "$2"
+        data_dir="$2"
+        shift
+        ;;
+      --bin-dir)
+        assert_not_empty "$key" "$2"
+        bin_dir="$2"
+        shift
+        ;;
+      --systemd-stdout)
+        assert_not_empty "$key" "$2"
+        systemd_stdout="$2"
+        shift
+        ;;
+      --systemd-stderr)
+        assert_not_empty "$key" "$2"
+        systemd_stderr="$2"
+        shift
+        ;;
+      --user)
+        assert_not_empty "$key" "$2"
+        user="$2"
+        shift
+        ;;
+      --cluster-tag-key)
+        assert_not_empty "$key" "$2"
+        cluster_tag_key="$2"
+        shift
+        ;;
+      --cluster-tag-value)
+        assert_not_empty "$key" "$2"
+        cluster_tag_value="$2"
+        shift
+        ;;
+      --skip-nomad-config)
+        skip_nomad_config="true"
+        ;;
+      --use-sudo)
+        use_sudo="true"
+        ;;
+      --environment)
+        assert_not_empty "$key" "$2"
+        environment+=("$2")
+        shift
+        ;;
+      --help)
+        print_usage
+        exit
+        ;;
+      *)
+        log_error "Unrecognized argument: $key"
+        print_usage
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+  if [[ "$server" == "true" ]]; then
+    assert_not_empty "--num-servers" "$num_servers"
+  fi
+
+  if [[ "$server" == "false" && "$client" == "false" ]]; then
+    log_error "At least one of --server or --client must be set"
+    exit 1
+  fi
+
+  if [[ -z "$use_sudo" ]]; then
+    if [[ "$client" == "true" ]]; then
+      use_sudo="true"
+    else
+      use_sudo="false"
+    fi
+  fi
+
+  assert_is_installed "systemctl"
+  assert_is_installed "aws"
+  assert_is_installed "curl"
+  assert_is_installed "jq"
+
+  if [[ -z "$config_dir" ]]; then
+    config_dir=$(cd "$SCRIPT_DIR/../config" && pwd)
+  fi
+
+  if [[ -z "$data_dir" ]]; then
+    data_dir=$(cd "$SCRIPT_DIR/../data" && pwd)
+  fi
+
+  if [[ -z "$bin_dir" ]]; then
+    bin_dir=$(cd "$SCRIPT_DIR/../bin" && pwd)
+  fi
+
+  # If $systemd_stdout and/or $systemd_stderr are empty, we leave them empty so that generate_systemd_config will use systemd's defaults (journal and inherit, respectively)
+
+  if [[ -z "$user" ]]; then
+    user=$(get_owner_of_path "$config_dir")
+  fi
+
+  if [[ "$skip_nomad_config" == "true" ]]; then
+    log_info "The --skip-nomad-config flag is set, so will not generate a default Nomad config file."
+  else
+    generate_nomad_config "$server" "$client" "$num_servers" "$config_dir" "$user"
+  fi
+
+  generate_systemd_config "$SYSTEMD_CONFIG_PATH" "$config_dir" "$data_dir" "$bin_dir" "$systemd_stdout" "$systemd_stderr" "$user" "$use_sudo" "${environment[@]}"
+  start_nomad
+}
+
+run "$@"
