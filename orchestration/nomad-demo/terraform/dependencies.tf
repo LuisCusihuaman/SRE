@@ -56,3 +56,7 @@ data "aws_subnet_ids" "default" {
 
 data "aws_region" "current" {
 }
+
+data "http" "my_ip"{
+  url = "http://ipv4.icanhazip.com"
+}

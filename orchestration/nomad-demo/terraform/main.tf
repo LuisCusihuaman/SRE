@@ -1,6 +1,9 @@
 provider "aws" {
   region = "us-east-1"
 }
+locals {
+  MY_PUBLIC_IP = "${chomp(data.http.my_ip.body)}/32"
+}
 
 //module "vpc" {
 //  source = "terraform-aws-modules/vpc/aws"
@@ -29,13 +32,7 @@ provider "aws" {
 # Packer template in the Consul AWS Module.
 # ---------------------------------------------------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------------------------------------------------
-# REQUIRE A SPECIFIC TERRAFORM VERSION OR HIGHER
-# ----------------------------------------------------------------------------------------------------------------------
 terraform {
-  # This module is now only being tested with Terraform 0.13.x. However, to make upgrading easier, we are setting
-  # 0.12.26 as the minimum version, as that version added support for required_providers with source URLs, making it
-  # forwards compatible with 0.13.x code.
   required_version = ">= 0.12.26"
 }
 
@@ -46,28 +43,24 @@ terraform {
 module "nomad_servers" {
   # When using these modules in your own templates, you will need to use a Git URL with a ref attribute that pins you
   # to a specific version of the modules, such as the following example:
-   source = "github.com/hashicorp/terraform-aws-nomad//modules/nomad-cluster?ref=v0.7.2"
+  source = "github.com/hashicorp/terraform-aws-nomad//modules/nomad-cluster?ref=v0.7.2"
 
-  cluster_name = "${var.nomad_cluster_name}-server"
+  cluster_name  = "${var.nomad_cluster_name}-server"
   instance_type = "t2.micro"
 
   # You should typically use a fixed size of 3 or 5 for your Nomad server cluster
-  min_size = var.num_nomad_servers
-  max_size = var.num_nomad_servers
+  min_size         = var.num_nomad_servers
+  max_size         = var.num_nomad_servers
   desired_capacity = var.num_nomad_servers
 
-  ami_id = var.ami_id
-  user_data = data.template_file.user_data_nomad_server.rendered
-
-  vpc_id = data.aws_vpc.default.id
-  subnet_ids = data.aws_subnet_ids.default.ids
-
-  # To make testing easier, we allow requests from any IP address here but in a production deployment, we strongly
-  # recommend you limit this to the IP address ranges of known, trusted servers inside your VPC.
-  allowed_ssh_cidr_blocks = ["0.0.0.0/0"]
-
-  allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
+  ami_id       = var.ami_id
+  user_data    = data.template_file.user_data_nomad_server.rendered
   ssh_key_name = var.ssh_key_name
+
+  vpc_id                      = data.aws_vpc.default.id
+  subnet_ids                  = data.aws_subnet_ids.default.ids
+  allowed_ssh_cidr_blocks     = [local.MY_PUBLIC_IP]
+  allowed_inbound_cidr_blocks = [local.MY_PUBLIC_IP]
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -92,29 +85,28 @@ module "nomad_clients" {
   # source = "github.com/hashicorp/terraform-aws-nomad//modules/nomad-cluster?ref=v0.0.1"
   source = "github.com/hashicorp/terraform-aws-nomad//modules/nomad-cluster?ref=v0.7.2"
 
-  cluster_name = "${var.nomad_cluster_name}-client"
+  cluster_name  = "${var.nomad_cluster_name}-client"
   instance_type = "t2.micro"
 
   # Give the clients a different tag so they don't try to join the server cluster
-  cluster_tag_key = "nomad-clients"
+  cluster_tag_key   = "nomad-clients"
   cluster_tag_value = var.nomad_cluster_name
 
   # To keep the example simple, we are using a fixed-size cluster. In real-world usage, you could use auto scaling
   # policies to dynamically resize the cluster in response to load.
 
-  min_size = var.num_nomad_clients
-  max_size = var.num_nomad_clients
+  min_size         = var.num_nomad_clients
+  max_size         = var.num_nomad_clients
   desired_capacity = var.num_nomad_clients
-  ami_id = var.ami_id
-  user_data = data.template_file.user_data_nomad_client.rendered
-  vpc_id = data.aws_vpc.default.id
-  subnet_ids = data.aws_subnet_ids.default.ids
+  ami_id           = var.ami_id
+  user_data        = data.template_file.user_data_nomad_client.rendered
+  ssh_key_name     = var.ssh_key_name
 
-  # To make testing easier, we allow Consul and SSH requests from any IP address here but in a production
-  # deployment, we strongly recommend you limit this to the IP address ranges of known, trusted servers inside your VPC.
-  allowed_ssh_cidr_blocks = ["0.0.0.0/0"]
-  allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
-  ssh_key_name = var.ssh_key_name
+  vpc_id                      = data.aws_vpc.default.id
+  subnet_ids                  = data.aws_subnet_ids.default.ids
+  allowed_ssh_cidr_blocks     = [local.MY_PUBLIC_IP]
+  allowed_inbound_cidr_blocks = [local.MY_PUBLIC_IP]
+
   ebs_block_devices = [
     {
       device_name = "/dev/xvde"
@@ -141,24 +133,21 @@ module "consul_iam_policies_clients" {
 module "consul_servers" {
   source = "github.com/hashicorp/terraform-aws-consul//modules/consul-cluster?ref=v0.8.0"
 
-  cluster_name = "${var.consul_cluster_name}-server"
-  cluster_size = var.num_consul_servers
+  cluster_name  = "${var.consul_cluster_name}-server"
+  cluster_size  = var.num_consul_servers
   instance_type = "t2.micro"
 
   # The EC2 Instances will use these tags to automatically discover each other and form a cluster
-  cluster_tag_key = var.cluster_tag_key
+  cluster_tag_key   = var.cluster_tag_key
   cluster_tag_value = var.consul_cluster_name
 
-  ami_id = var.ami_id
-  user_data = data.template_file.user_data_consul_server.rendered
-
-  vpc_id = data.aws_vpc.default.id
-  subnet_ids = data.aws_subnet_ids.default.ids
-
-  # To make testing easier, we allow Consul and SSH requests from any IP address here but in a production
-  # deployment, we strongly recommend you limit this to the IP address ranges of known, trusted servers inside your VPC.
-  allowed_ssh_cidr_blocks = ["0.0.0.0/0"]
-
-  allowed_inbound_cidr_blocks = ["0.0.0.0/0"]
+  ami_id       = var.ami_id
+  user_data    = data.template_file.user_data_consul_server.rendered
   ssh_key_name = var.ssh_key_name
+
+  vpc_id                      = data.aws_vpc.default.id
+  subnet_ids                  = data.aws_subnet_ids.default.ids
+  allowed_ssh_cidr_blocks     = []
+  allowed_inbound_cidr_blocks = [local.MY_PUBLIC_IP]
+
 }
