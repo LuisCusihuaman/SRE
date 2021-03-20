@@ -14,3 +14,11 @@ All the knowledge gathered came in this module was thanks to the following mater
 -   Explore best practices for application delivery and life cycle management
 -   Leverage Helm in a secure and stable manner that is fit for your enterprise
 -   Discover the ins and outs of automation with Helm
+
+**Chapter 3: Installing your First Helm Chart**
+
+1. Installing a WordPress chart
+2. Accessing a WordPress application
+3. Upgrading,Rolling and Uninstalling a WordPress release
+
+-   📂 [**03-first-helm-chart**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/03-first-helm-chart)
