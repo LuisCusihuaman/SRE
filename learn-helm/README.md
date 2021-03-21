@@ -22,3 +22,11 @@ All the knowledge gathered came in this module was thanks to the following mater
 3. Upgrading,Rolling and Uninstalling a WordPress release
 
 -   📂 [**03-first-helm-chart**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/03-first-helm-chart)
+
+**Chapter 5: Building Your First Helm Chart**
+
+1. Creating a Guestbook Helm chart
+2. Improving the Guestbook Helm chart
+3. Publishing the Guestbook chart to a chart repository
+
+-   📂 [**05-build-helm-chart**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/05-build-helm-chart)
