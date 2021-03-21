@@ -1,0 +1,182 @@
+image:
+    tag: 2.222.4
+resources:
+    limits:
+        cpu: 500m
+        memory: 2Gi
+service:
+    master:
+        type: NodePort
+serviceAccount:
+    master:
+        create: true
+    agent:
+        create: true
+rbac:
+    master:
+        create: true
+        rules:
+            - apiGroups:
+                  - ""
+              resources:
+                  - pods
+              verbs:
+                  - create
+                  - delete
+                  - get
+                  - list
+                  - watch
+            - apiGroups:
+                  - ""
+              resources:
+                  - pods/exec
+              verbs:
+                  - get
+    agent:
+        create: true
+        rules:
+            - apiGroups:
+                  - ""
+              resources:
+                  - pods
+                  - pods/log
+                  - services
+                  - configmaps
+                  - secrets
+                  - serviceaccounts
+                  - persistentvolumeclaims
+                  - namespaces
+                  - events
+              verbs:
+                  - get
+                  - list
+                  - update
+                  - watch
+                  - create
+                  - delete
+            - apiGroups:
+                  - "apps"
+              resources:
+                  - statefulsets
+                  - deployments
+                  - replicasets
+              verbs:
+                  - get
+                  - list
+                  - update
+                  - watch
+                  - create
+                  - delete
+persistence:
+    size: 2Gi
+javaOpts: >-
+    -Dhudson.slaves.NodeProvisioner.initialDelay=0
+    -Dhudson.model.LoadStatistics.decay=0.7
+    -Dhudson.slaves.NodeProvisioner.MARGIN=30
+    -Dhudson.slaves.NodeProvisioner.MARGIN0=0.6
+    -XX:+UnlockExperimentalVMOptions
+    -XX:+UseCGroupMemoryLimitForHeap
+    -XX:MaxRAMFraction=2
+    -XshowSettings:vm
+    -Djenkins.install.runSetupWizard=false
+referenceContent:
+    - data:
+          - fileName: plugins.txt
+            fileContent: |
+                configuration-as-code:1.46
+                git:4.5.2
+                job-dsl:1.77
+                kubernetes:1.26.0
+                workflow-aggregator:2.6
+
+          - fileName: jenkins.yaml
+            fileContent: |
+                credentials:
+                  system:
+                    domainCredentials:
+                      - credentials:
+                          - usernamePassword:
+                              scope: GLOBAL
+                              id: github-auth
+                              username: {{ required "value 'githubUsername' is required" .Values.githubUsername }}
+                              password: {{ required "value 'githubPassword' is required" .Values.githubPassword }}
+                              description: Password to authenticate with GitHub
+                jenkins:
+                  numExecutors: 0
+                  clouds:
+                    - kubernetes:
+                        name: kubernetes
+                        serverUrl: https://kubernetes.default
+                        namespace: {{ .Release.Namespace }}
+                        jenkinsUrl: http://{{ include "jenkins.fullname" . }}-master:{{ .Values.service.master.port }}
+                        jenkinsTunnel: {{ include "jenkins.fullname" . }}-agent:{{ .Values.service.agent.port }}
+                        templates:
+                          - name: chart-testing-agent
+                            label: chart-testing-agent
+                            idleMinutes: 0
+                            namespace: {{ .Release.Namespace }}
+                            nodeUsageMode: NORMAL
+                            serviceAccount: {{ if .Values.serviceAccount.agent.name }}{{ .Values.serviceAccount.agent.name }}{{ else }}{{ include "jenkins.fullname" . }}-agent{{ end }}
+                            containers:
+                              - name: chart-testing
+                                image: quay.io/helmpack/chart-testing:v3.0.0-beta.1
+                                ttyEnabled: true
+                                resourceLimitCpu: 200m
+                                resourceLimitMemory: 500Mi
+                            envVars:
+                              - envVar:
+                                  key: GITHUB_PAGES_REPO_URL
+                                  value: {{ required "value 'githubPagesRepoUrl' is required" .Values.githubPagesRepoUrl }}
+                              - envVar:
+                                  key: GITHUB_PAGES_SITE_URL
+                                  value: {{ .Values.githubPagesSiteUrl }}
+                              - envVar:
+                                  key: GITHUB_PAGES_BASE_BRANCH
+                                  value: {{ .Values.githubPagesBaseBranch }}
+                jobs:
+                  - script: |-
+                      multibranchPipelineJob('Test and Release Helm Charts') {
+                        factory {
+                          workflowBranchProjectFactory {
+                            scriptPath('helm-charts/Jenkinsfile')
+                          }
+                        }
+                        branchSources {
+                          git {
+                            id('test')
+                            remote({{ required "value 'githubForkUrl' is required" .Values.githubForkUrl | quote }})
+                            credentialsId('github-auth')
+                          }
+                        }
+                        orphanedItemStrategy {
+                          discardOldItems {
+                            numToKeep(10)
+                          }
+                        }
+                      }
+                      {{- /*
+                      The below job will be configured if the githubPagesSiteUrl value has been configured.
+                      This will imply that the reader is on the CD portion of Chapter 7, and that this
+                        job is now relevant and should be displayed.
+                      */ -}}
+                      {{- if .Values.githubPagesSiteUrl }}
+                      multibranchPipelineJob('Deploy NGINX Chart') {
+                        factory {
+                          workflowBranchProjectFactory {
+                            scriptPath('nginx-cd/Jenkinsfile')
+                          }
+                        }
+                        branchSources {
+                          git {
+                            id('test')
+                            remote({{ required "value 'githubForkUrl' is required" .Values.githubForkUrl | quote }})
+                            credentialsId('github-auth')
+                          }
+                        }
+                        orphanedItemStrategy {
+                          discardOldItems {
+                            numToKeep(10)
+                          }
+                        }
+                      }
+                      {{- end }}

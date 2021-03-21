@@ -38,3 +38,12 @@ All the knowledge gathered came in this module was thanks to the following mater
 3. Improving chart tests with the chart testing project
 
 -   📂 [**06-testing-helm-charts**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/06-testing-helm-charts)
+
+**Chapter 7: Automating Helm Processes Using CI/CD and GitOps**
+
+1. Creating a CI pipeline to build Helm charts
+2. Creating a CD pipeline to deploy applications with Helm
+
+-   📂 07-cicd-gitops
+    -   📂 [**01-ci-charts**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/07-cicd-gitops/01-ci-charts)
+    -   📂 [**02-cicd-app**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/07-cicd-gitops/02-cicd-app)
