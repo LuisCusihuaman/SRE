@@ -30,3 +30,11 @@ All the knowledge gathered came in this module was thanks to the following mater
 3. Publishing the Guestbook chart to a chart repository
 
 -   📂 [**05-build-helm-chart**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/05-build-helm-chart)
+
+**Chapter 6: Testing Helm Charts**
+
+1. Verifying Helm templating
+2. Testing in a live cluster
+3. Improving chart tests with the chart testing project
+
+-   📂 [**06-testing-helm-charts**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/06-testing-helm-charts)
