@@ -1,6 +1,6 @@
 # Automating Helm Processes Using CI/CD and GitOps
 
-Requirements:
+Requirements (**Not working, helm jenkins broken**):
 
 -   minikube, kubectl, helm, git, gh (Github cli)
 

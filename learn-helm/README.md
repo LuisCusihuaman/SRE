@@ -46,4 +46,3 @@ All the knowledge gathered came in this module was thanks to the following mater
 
 -   📂 07-cicd-gitops
     -   📂 [**01-ci-charts**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/07-cicd-gitops/01-ci-charts)
-    -   📂 [**02-cicd-app**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm/07-cicd-gitops/02-cicd-app)
