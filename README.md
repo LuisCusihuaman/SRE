@@ -39,3 +39,9 @@ I Integrated Prometheus with Alertmanager and Grafana for building a complete mo
 Exploring PromQL, Prometheus' functional query language, and deploy Prometheus components using Kubernetes and traditional instances
 
 -   📂 [**hands-on-infrastructure-monitoring-with-prometheus**](https://github.com/LuisCusihuaman/SRE/tree/master/hands-on-infrastructure-monitoring-with-prometheus)
+
+I Got up and running with a Helm to effectively manage applications deployed in Kubernetes.
+
+I installed, upgraded, shared, and managed applications deployed in Kubernetes
+
+-   📂 [**learn-helm**](https://github.com/LuisCusihuaman/SRE/tree/master/learn-helm)
