@@ -1,5 +1,6 @@
 .idea
 .vscode
+*.pem
 # Local .terraform directories
 **/.terraform/*
 
