@@ -34,6 +34,13 @@ variable "cluster_endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "create_private_node_group" {
+  description = "Determines if the private node group should be created."
+  type        = bool
+  default     = false
+}
+
+
 # EKS Node Group Variables
 ## Placeholder space you can create if required
 

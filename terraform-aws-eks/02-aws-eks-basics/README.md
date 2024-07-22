@@ -65,6 +65,11 @@ variable "cluster_endpoint_public_access_cidrs" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "create_private_node_group" {
+  description = "Determines if the private node group should be created."
+  type        = bool
+  default     = false
+}
 # EKS Node Group Variables
 ## Placeholder space you can create if required
 
@@ -271,10 +276,11 @@ resource "aws_eks_node_group" "eks_ng_private" {
 ```t
 cluster_name = "eksdemo1"
 cluster_service_ipv4_cidr = "172.20.0.0/16"
-cluster_version = "1.26"
+cluster_version = "1.30"
 cluster_endpoint_private_access = true
 cluster_endpoint_public_access = true
 cluster_endpoint_public_access_cidrs = ["0.0.0.0/0"]
+create_private_node_group = true
 ```
 
 ## Step-10: c5-02-eks-outputs.tf
@@ -354,23 +360,23 @@ output "node_group_public_version" {
 # EKS Node Group Outputs - Private
 
 output "node_group_private_id" {
-  description = "Node Group 1 ID"
-  value       = aws_eks_node_group.eks_ng_private.id
+  description = "Private Node Group ID"
+  value       = var.create_private_node_group ? aws_eks_node_group.eks_ng_private[0].id : ""
 }
 
 output "node_group_private_arn" {
   description = "Private Node Group ARN"
-  value       = aws_eks_node_group.eks_ng_private.arn
+  value       = var.create_private_node_group ? aws_eks_node_group.eks_ng_private[0].arn : ""
 }
 
 output "node_group_private_status" {
   description = "Private Node Group status"
-  value       = aws_eks_node_group.eks_ng_private.status 
+  value       = var.create_private_node_group ? aws_eks_node_group.eks_ng_private[0].status : ""
 }
 
 output "node_group_private_version" {
   description = "Private Node Group Kubernetes Version"
-  value       = aws_eks_node_group.eks_ng_private.version
+  value       = var.create_private_node_group ? aws_eks_node_group.eks_ng_private[0].version : ""
 }
 ```
 
@@ -541,87 +547,19 @@ kubectl describe deploy coredns -n kube-system
 - EKS Cluster Security Group
 - EKS Node Security Group
 
-## Step-20: Comment EKS Private Node Group TF Configs
-- Currently we have 3 EC2 Instances running but ideally we don't need all 3 for our next 3 section (Section-09, 10 and 11), so we will do some cost cutting now. 
-- Over the process we will learn how to deprovision resources using Terraform for EKS Cluster
-- In all the upcoming few demos we don't need to run both Public and Private Node Groups.
-- This is created during Basic EKS Cluster to let you know that we can create EKS Node Groups in our desired subnet (Example: Private Subnets) provided if we have outbound connectivity via NAT Gateway to connect to EKS Cluster Control Plane API Server Endpoint. 
-- This adds additional cost for us.
-- We will run only Public Node Group with 1 EC2 Instance as Worker Node
-- We will comment Private Node Group related code
-- **Change-1:** Comment all code in `c5-08-eks-node-group-private.tf`
+## Step-20: Change EKS Private Node Group to False
+-   Currently we have 3 EC2 Instances running but ideally we don't need all 3 for our next 3 section (Section-03, 4 and 5), so we will do some cost cutting now.
+-   Over the process we will learn how to deprovision resources using Terraform for EKS Cluster
+-   In all the upcoming few demos we don't need to run both Public and Private Node Groups.
+-   This is created during Basic EKS Cluster to let you know that we can create EKS Node Groups in our desired subnet (Example: Private Subnets) provided if we have outbound connectivity via NAT Gateway to connect to EKS Cluster Control Plane API Server Endpoint.
+-   This adds additional cost for us.
+-   We will run only Public Node Group with 1 EC2 Instance as Worker Node
+-   We will comment Private Node Group related code
+
+**Change:** Change private node group boolean to false `eks.auto.tfvars`
+
 ```t
-# Create AWS EKS Node Group - Private
-/*
-resource "aws_eks_node_group" "eks_ng_private" {
-  cluster_name    = aws_eks_cluster.eks_cluster.name
-
-  node_group_name = "${local.name}-eks-ng-private"
-  node_role_arn   = aws_iam_role.eks_nodegroup_role.arn
-  subnet_ids      = module.vpc.private_subnets
-  #version = var.cluster_version #(Optional: Defaults to EKS Cluster Kubernetes version)    
-  
-  ami_type = "AL2_x86_64"  
-  capacity_type = "ON_DEMAND"
-  disk_size = 20
-  instance_types = ["t3.medium"]
-  
-  
-  remote_access {
-    ec2_ssh_key = "eks-terraform-key"    
-  }
-
-  scaling_config {
-    desired_size = 1
-    min_size     = 1    
-    max_size     = 2
-  }
-
-  # Desired max percentage of unavailable worker nodes during node group update.
-  update_config {
-    max_unavailable = 1    
-    #max_unavailable_percentage = 50    # ANY ONE TO USE
-  }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
-  depends_on = [
-    aws_iam_role_policy_attachment.eks-AmazonEKSWorkerNodePolicy,
-    aws_iam_role_policy_attachment.eks-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.eks-AmazonEC2ContainerRegistryReadOnly,
-  ]  
-  tags = {
-    Name = "Private-Node-Group"
-  }
-}
-
-*/
-```
-- **Change-2:** Comment private node group related Terraform Outputs in `c5-02-eks-outputs.tf`
-```t
-# EKS Node Group Outputs - Private
-/*
-output "node_group_private_id" {
-  description = "Node Group 1 ID"
-  value       = aws_eks_node_group.eks_ng_private.id
-}
-
-output "node_group_private_arn" {
-  description = "Private Node Group ARN"
-  value       = aws_eks_node_group.eks_ng_private.arn
-}
-
-output "node_group_private_status" {
-  description = "Private Node Group status"
-  value       = aws_eks_node_group.eks_ng_private.status 
-}
-
-output "node_group_private_version" {
-  description = "Private Node Group Kubernetes Version"
-  value       = aws_eks_node_group.eks_ng_private.version
-}
-
-*/
+create_private_node_group = false
 ```
 
 ## Step-21: Execute Terraform Commands & verify
