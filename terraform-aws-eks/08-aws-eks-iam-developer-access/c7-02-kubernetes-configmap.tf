@@ -26,6 +26,13 @@ locals {
       # Important Note: The group name specified in clusterrolebinding and in aws-auth configmap groups should be same. 
       groups = ["${kubernetes_cluster_role_binding_v1.eksreadonly_clusterrolebinding.subject[0].name}"]
     },
+    {
+      rolearn  = "${aws_iam_role.eks_developer_role.arn}"
+      username = "eks-developer" # Just a place holder name
+      #groups   = [ "eks-developer-group" ]
+      # Important Note: The group name specified in clusterrolebinding and in aws-auth configmap groups should be same.       
+      groups = ["${kubernetes_role_binding_v1.eksdeveloper_rolebinding.subject[0].name}"]
+    },
   ]
   configmap_users = [
     {
@@ -44,7 +51,9 @@ locals {
 resource "kubernetes_config_map_v1" "aws_auth" {
   depends_on = [
     aws_eks_cluster.eks_cluster,
-    kubernetes_cluster_role_binding_v1.eksreadonly_clusterrolebinding # Because we are using the group name from this resource
+    kubernetes_cluster_role_binding_v1.eksreadonly_clusterrolebinding, # Because we are using the group name from this resource
+    kubernetes_cluster_role_binding_v1.eksdeveloper_clusterrolebinding,
+    kubernetes_role_binding_v1.eksdeveloper_rolebinding
   ]
   metadata {
     name      = "aws-auth"
