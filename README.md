@@ -16,6 +16,12 @@ I built production-grade infrastructure with Terraform small, composable, testab
 
 -   📂 [**terraform\-up\-and\-running**](https://github.com/LuisCusihuaman/SRE/tree/master/terraform-up-and-running)
 
+Mastered Terraform and Kubernetes on AWS EKS, covering 50+ Kubernetes and 30+ Terraform concepts. Built a 3-tier AWS VPC network with Public and Private Node Groups, implemented AWS EKS IRSA, and automated AWS EBS CSI Controller installation for Kubernetes storage.
+
+Installed AWS load balancer controller with 14 ingress service demos, implemented Kubernetes Cluster Autoscaler, Horizontal and Vertical Pod Autoscaler, and set up AWS EKS Monitoring and Logging.
+
+- 📂 [**terraform-aws-eks**](https://github.com/LuisCusihuaman/SRE/tree/master/terraform-aws-eks)
+
 I automated software provisioning, configuration management and used Ansible as a deployment and orchestration tool.
 
 Following best practices for cloud environment inventories, troubleshooting issues triggered during Ansible playbook runs.
