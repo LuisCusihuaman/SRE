@@ -2,6 +2,8 @@
 
 In this repository I'll demonstrate all the experience that I've built on my own, through courses, books and creating my own SRE / DevOps / Cloud Computing demos
 
+![BeFunky-collage](https://github.com/user-attachments/assets/aff3d40a-9df3-4d06-bedb-d5387fbf6ad0)
+
 ## 🚀 Projects Structure
 
 I implemented, managed, and automated continuous delivery systems and methodologies, security controls, governance processes, and compliance validation in this module.
